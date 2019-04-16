@@ -723,7 +723,7 @@ VOID APQuickResponeForRateUpExec(
 				ratio = (RA_INTERVAL-pAd->ra_fast_interval)/pAd->ra_fast_interval;
 
 			/* downgrade TX quality if PER >= Rate-Down threshold */
-			if (TxErrorRatio >= TrainDown)
+			if (TxErrorRatio > TrainDown)
 			{
 				MlmeSetTxQuality(pEntry, CurrRateIdx, DRS_TX_QUALITY_WORST_BOUND);
 			}
@@ -735,10 +735,9 @@ VOID APQuickResponeForRateUpExec(
 			{
 // TODO: gaa - use different criterion for train up in Old RA?
 				/*if ((pEntry->LastTxOkCount + 2) >= OneSecTxNoRetryOKRationCount) */
-				if (TxErrorRatio >= TrainDown)
+				if (TxErrorRatio > TrainDown)
 				{
-						MlmeSetTxQuality(pEntry, CurrRateIdx, DRS_TX_QUALITY_WORST_BOUND);
-
+					MlmeSetTxQuality(pEntry, CurrRateIdx, DRS_TX_QUALITY_WORST_BOUND);
 					MlmeRestoreLastRate(pEntry);
 				}
 				else
@@ -819,7 +818,7 @@ VOID MlmeOldRateAdapt(
 	pEntry->LastSecTxRateChangeAction = RATE_NO_CHANGE;
 
 	/* Downgrade TX quality if PER >= Rate-Down threshold */
-	if (TxErrorRatio >= TrainDown)
+	if (TxErrorRatio > TrainDown)
 	{
 		MlmeSetTxQuality(pEntry, CurrRateIdx, DRS_TX_QUALITY_WORST_BOUND);
 		if (CurrRateIdx != DownRateIdx)
