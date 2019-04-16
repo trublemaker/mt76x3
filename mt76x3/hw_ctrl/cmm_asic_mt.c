@@ -2756,7 +2756,7 @@ VOID asic_mcs_lut_update(RTMP_ADAPTER *pAd, MAC_TABLE_ENTRY *pEntry)
 	DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("%s():WCID=%d, HTPhyMode=0x%x\n",
 				__FUNCTION__, pEntry->wcid, pEntry->HTPhyMode.word));
 
-	DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("\tCurTxRateIdx=%d, Mode/BW/MCS/STBC/SGI=%d/%d/%d/%d/%d\n\n",
+	DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("\tCurTxRateIdx=%d, Mode/BW/MCS/STBC/SGI=%d/%d/%d/%d/%d\n",
 		pEntry->CurrTxRateIndex,
 		pEntry->HTPhyMode.field.MODE,
 		pEntry->HTPhyMode.field.BW,
@@ -6525,7 +6525,7 @@ INT32 MtAsicGetThemalSensor(RTMP_ADAPTER *pAd, CHAR type)
 				g_cThermoSlopeVariation = pAd->EEPROMImage[THADC_SLOP] & THERMO_SLOPE_VARIATION_MASK;
 				if (g_cThermoSlopeVariation > 16)
 					g_cThermoSlopeVariation -= 32;
-	}else
+				}else
 					g_cThermoSlopeVariation = 0;
 				
 			g_cThermoRefOffset = pAd->EEPROMImage[THERMAL_COMPENSATION_OFFSET] + 28;

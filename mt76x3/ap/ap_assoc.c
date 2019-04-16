@@ -52,26 +52,26 @@ static void ap_assoc_info_debugshow(
 	struct wifi_dev *wdev;
 	wdev = &pAd->ApCfg.MBSSID[pEntry->func_tb_idx].wdev;
 
-	printk("%s - Assign AID=%d to %sGHz STA %02x:%02x:%02x:%02x:%02x:%02x%s\n", sAssoc, pEntry->Aid, pRange, PRINT_MAC(pEntry->Addr), sFTSupport);
+	DBGPRINT(RT_DEBUG_WARN,("%s - Assign AID=%d to %sGHz STA %02x:%02x:%02x:%02x:%02x:%02x%s\n", sAssoc, pEntry->Aid, pRange, PRINT_MAC(pEntry->Addr), sFTSupport));
 
 #ifdef DOT11_N_SUPPORT
 	if (ie_list->ht_cap_len && WMODE_CAP_N(pAd->CommonCfg.PhyMode))
 	{
 		assoc_ht_info_debugshow(pAd, pEntry, ie_list->ht_cap_len, &ie_list->HTCapability);
 
-		printk("\n%s - HT support STA. Update AP OperaionMode=%d, fAnyStationIsLegacy=%d, fAnyStation20Only=%d, fAnyStationNonGF=%d\n",
+		DBGPRINT(RT_DEBUG_WARN,("\n%s - HT support STA. Update AP OperaionMode=%d, fAnyStationIsLegacy=%d, fAnyStation20Only=%d, fAnyStationNonGF=%d\n",
 					sAssoc,
 					pAd->CommonCfg.AddHTInfo.AddHtInfo2.OperaionMode,
 					pAd->MacTab.fAnyStationIsLegacy,
 					pAd->MacTab.fAnyStation20Only,
-					pAd->MacTab.fAnyStationNonGF);
+					pAd->MacTab.fAnyStationNonGF));
 
 #ifdef DOT11_VHT_AC
 		if ((ie_list->vht_cap_len) &&
 			WMODE_CAP_AC(pAd->CommonCfg.PhyMode) &&
 			(pAd->CommonCfg.Channel > 14))
 		{
-			printk("%s - VHT STA\n", sAssoc);
+			DBGPRINT(RT_DEBUG_WARN,"%s - VHT STA\n", sAssoc);
 			assoc_vht_info_debugshow(pAd, pEntry, &ie_list->vht_cap, NULL);
 		}
 #endif /* DOT11_VHT_AC */

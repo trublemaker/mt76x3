@@ -404,7 +404,7 @@ static inline UCHAR SelectClearChannelCCA(
 	
 	AutoChannelSkipListSetDirty(pAd);
 	
-	printk("=====================================================\n");
+	//printk("=====================================================\n");
 	for (channel_idx = 0; channel_idx < pAd->ChannelListNum; channel_idx++)
 	{
 		printk("Channel %d : Dirty = %ld, False CCA = %u, Busy Time = %u, Skip Channel = %s\n",
@@ -414,7 +414,7 @@ static inline UCHAR SelectClearChannelCCA(
 					pChannelInfo->chanbusytime[channel_idx],
 					(pChannelInfo->SkipList[channel_idx] == TRUE) ? "TRUE" : "FALSE");
 	}
-	printk("=====================================================\n");
+	//printk("=====================================================\n");
 
 	min_dirty = min_falsecca = 0xFFFFFFFF;
 
@@ -638,7 +638,7 @@ static inline UCHAR SelectClearChannelBusyTime(
 
 	AutoChannelSkipListSetDirty(pAd);
 	
-	printk("=====================================================\n");
+	//printk("=====================================================\n");
 	for (channel_idx = 0; channel_idx < pAd->ChannelListNum; channel_idx++)
 	{
 		printk("Channel %d : Busy Time = %u, Skip Channel = %s\n",
@@ -646,7 +646,7 @@ static inline UCHAR SelectClearChannelBusyTime(
 					pChannelInfo->chanbusytime[channel_idx],
 					(pChannelInfo->SkipList[channel_idx] == TRUE) ? "TRUE" : "FALSE");
 	}
-	printk("=====================================================\n");
+	//printk("=====================================================\n");
 
 	min_busytime = 0xFFFFFFFF;
 	candidate_ch = -1;
@@ -810,7 +810,7 @@ static inline UCHAR SelectClearChannelApCnt(
 
 	AutoChannelSkipListSetDirty(pAd);
 
-	printk("=====================================================\n");
+	//printk("=====================================================\n");
 	for (channel_index=0 ; channel_index < pAd->ChannelListNum ; channel_index++)
 		/* debug messages */
 		printk("Channel %d : Dirty = %ld, ApCnt=%ld, Busy Time = %d, Skip Channel = %s\n", 
@@ -819,7 +819,7 @@ static inline UCHAR SelectClearChannelApCnt(
 				pChannelInfo->ApCnt[channel_index],
 				pChannelInfo->chanbusytime[channel_index],
 				(pChannelInfo->SkipList[channel_index] == TRUE) ? "TRUE" : "FALSE");
-	printk("=====================================================\n");
+	//printk("=====================================================\n");
 
 	pAd->ApCfg.AutoChannel_Channel = 0;
 	

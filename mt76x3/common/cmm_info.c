@@ -1060,7 +1060,7 @@ INT Set_ChannelListShow_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
 	NdisMoveMemory(CountryCode, pAd->CommonCfg.CountryCode, 2);
 	if (pAd->CommonCfg.DfsType == MAX_RD_REGION)
 		pAd->CommonCfg.DfsType = pChRegion->DfsType;
-	DBGPRINT(RT_DEBUG_OFF, ("=========================================\n"));
+	//DBGPRINT(RT_DEBUG_OFF, ("=========================================\n"));
 	DBGPRINT(RT_DEBUG_OFF, ("CountryCode:%s\n", CountryCode));
 	DBGPRINT(RT_DEBUG_OFF, ("DfsType:%s\n",
 					(pAd->CommonCfg.DfsType == JAP) ? "JAP" :
@@ -1094,7 +1094,7 @@ INT Set_ChannelListShow_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
 						(pChRegion->pChDesp[EntryIdx].DfsReq == TRUE) ? "TRUE" : "FALSE"));
 		}	
 	}
-	DBGPRINT(RT_DEBUG_OFF, ("=========================================\n"));
+	//DBGPRINT(RT_DEBUG_OFF, ("=========================================\n"));
 	return TRUE;
 }
 
@@ -2686,8 +2686,8 @@ copy_mac_table_entry(RT_802_11_MAC_ENTRY *pDst, MAC_TABLE_ENTRY *pEntry)
 
 #ifndef CONFIG_STA_SUPPORT
 	/* Fill TX/Rx Bytes per clients */
-	pDst->TxBytes = pEntry->TxBytes;
-	pDst->RxBytes = pEntry->RxBytes;
+	//pDst->TxBytes = pEntry->TxBytes;
+	//pDst->RxBytes = pEntry->RxBytes;
 #endif
 
 	/* the connected time per entry*/
@@ -6983,7 +6983,7 @@ INT	Show_ModuleTxpower_Proc(
  
  	ifIndex = pObj->ioctl_if;
  	
- 	printk("=============================================================\n");
+ 	//printk("=============================================================\n");
  	if((pAd->ApCfg.ApCliTab[ifIndex].CtrlCurrState == APCLI_CTRL_CONNECTED)
  		&& (pAd->ApCfg.ApCliTab[ifIndex].SsidLen != 0))
  	{
@@ -7009,7 +7009,7 @@ INT	Show_ModuleTxpower_Proc(
  	{
  		printk("ApCli%d Connected AP : Disconnect\n",ifIndex);
  	}
- 	printk("=============================================================\n");
+ 	//printk("=============================================================\n");
      	DBGPRINT(RT_DEBUG_TRACE, ("<==RTMPIoctlConnStatus\n"));
  	return TRUE;
 }
@@ -8105,7 +8105,7 @@ void DisplayTxAgg (RTMP_ADAPTER *pAd)
 		for (i=0; i<MAX_AGG_CNT; i++) {
 			DBGPRINT(RT_DEBUG_OFF, ("\t%d MPDU=%ld (%ld%%)\n", i+1, aggCnt[i+2], aggCnt[i+2]*100/totalCount));
 		}
-	printk("====================\n");
+	//printk("====================\n");
 
 }
 #endif /* DOT11_N_SUPPORT */

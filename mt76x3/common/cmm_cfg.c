@@ -2525,7 +2525,7 @@ rssi_stat));
 		DBGPRINT(RT_DEBUG_OFF, ("\t%d", silent_stat[idx]));
 		INC_RING_INDEX(idx, ED_STAT_CNT);
 	} while (idx != end);
-	DBGPRINT(RT_DEBUG_OFF, ("\n==========================\n"));
+	//DBGPRINT(RT_DEBUG_OFF, ("\n==========================\n"));
 
 
 	DBGPRINT(RT_DEBUG_OFF, ("BIG WBRSSI %% - Over -40dBm \n"));
@@ -2544,7 +2544,7 @@ rssi_stat));
 		INC_RING_INDEX(idx, ED_STAT_CNT);
 	} while (idx != end);
 	DBGPRINT(RT_DEBUG_OFF, ("\n"));
-	DBGPRINT(RT_DEBUG_OFF, ("\n==========================\n"));
+	//DBGPRINT(RT_DEBUG_OFF, ("\n==========================\n"));
 
 
 	DBGPRINT(RT_DEBUG_OFF, ("Dump CH_IDLE_STAT\n"));
@@ -2563,7 +2563,7 @@ rssi_stat));
 		INC_RING_INDEX(idx, ED_STAT_CNT);
 	} while (idx != end);
 	DBGPRINT(RT_DEBUG_OFF, ("\n"));
-	DBGPRINT(RT_DEBUG_OFF, ("\n==========================\n"));	
+	//DBGPRINT(RT_DEBUG_OFF, ("\n==========================\n"));	
 
 	DBGPRINT(RT_DEBUG_OFF, ("Dump CH_BUSY_STAT\n"));
 	DBGPRINT(RT_DEBUG_OFF, ("RawCnt:"));
@@ -2581,7 +2581,7 @@ rssi_stat));
 		INC_RING_INDEX(idx, ED_STAT_CNT);
 	} while (idx != end);
 	DBGPRINT(RT_DEBUG_OFF, ("\n"));
-	DBGPRINT(RT_DEBUG_OFF, ("\n==========================\n"));
+	//DBGPRINT(RT_DEBUG_OFF, ("\n==========================\n"));
 
 	return TRUE;
 }

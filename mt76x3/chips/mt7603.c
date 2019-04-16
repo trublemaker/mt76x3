@@ -144,7 +144,7 @@ static VOID mt7603_init_mac_cr(RTMP_ADAPTER *pAd)
 	UINT32 mac_val;
 	UINT32 TxAggLimit;
 
-	DBGPRINT(RT_DEBUG_OFF, ("%s()-->\n", __FUNCTION__));
+	DBGPRINT(RT_DEBUG_OFF, ("%s()-->\n", __FUNCTION__));	
 
 	/* Preparation of TxD DW2~DW6 when we need run 3DW format */
 	asic_set_tmac_info_template(pAd);
@@ -772,25 +772,25 @@ static VOID mt7603_show_pwr_info(RTMP_ADAPTER *pAd)
 #endif
 	UINT32 value;
 
-	DBGPRINT(RT_DEBUG_OFF, ("\n===================================\n"));
+	//DBGPRINT(RT_DEBUG_OFF, ("\n===================================\n"));
 	DBGPRINT(RT_DEBUG_OFF, ("channel info related to power\n"));
-	DBGPRINT(RT_DEBUG_OFF, ("===================================\n"));
+	//DBGPRINT(RT_DEBUG_OFF, ("===================================\n"));
 
 	if (pAd->LatchRfRegs.Channel < 14) {
 		DBGPRINT(RT_DEBUG_OFF, ("central channel = %d, low_mid_hi = %d\n", pAd->LatchRfRegs.Channel,
 							get_low_mid_hi_index(pAd->LatchRfRegs.Channel)));
 	}
 
-	DBGPRINT(RT_DEBUG_OFF, ("\n===================================\n"));
+	//DBGPRINT(RT_DEBUG_OFF, ("\n===================================\n"));
 	DBGPRINT(RT_DEBUG_OFF, ("channel power(unit: 0.5dbm)\n"));
-	DBGPRINT(RT_DEBUG_OFF, ("===================================\n"));
+	//DBGPRINT(RT_DEBUG_OFF, ("===================================\n"));
 	DBGPRINT(RT_DEBUG_OFF, ("tx_0_target_pwr_g_band = 0x%x\n", cap->tx_0_target_pwr_g_band));
 	DBGPRINT(RT_DEBUG_OFF, ("tx_1_target_pwr_g_band = 0x%x\n", cap->tx_1_target_pwr_g_band));
 
 	/* channel power delta */
-	DBGPRINT(RT_DEBUG_OFF, ("\n===================================\n"));
+	//DBGPRINT(RT_DEBUG_OFF, ("\n===================================\n"));
 	DBGPRINT(RT_DEBUG_OFF, ("channel power delta(unit: 0.5db)\n"));
-	DBGPRINT(RT_DEBUG_OFF, ("===================================\n"));
+	//DBGPRINT(RT_DEBUG_OFF, ("===================================\n"));
 	DBGPRINT(RT_DEBUG_OFF, ("tx_0_chl_pwr_delta_g_band[G_BAND_LOW] = 0x%x\n", cap->tx_0_chl_pwr_delta_g_band[G_BAND_LOW]));
 	DBGPRINT(RT_DEBUG_OFF, ("tx_0_chl_pwr_delta_g_band[G_BAND_MID] = 0x%x\n", cap->tx_0_chl_pwr_delta_g_band[G_BAND_MID]));
 	DBGPRINT(RT_DEBUG_OFF, ("tx_0_chl_pwr_delta_g_band[G_BAND_HI] = 0x%x\n", cap->tx_0_chl_pwr_delta_g_band[G_BAND_HI]));
@@ -805,9 +805,9 @@ static VOID mt7603_show_pwr_info(RTMP_ADAPTER *pAd)
 	DBGPRINT(RT_DEBUG_OFF, ("delta_tx_pwr_bw40_g_band = %d\n", cap->delta_tx_pwr_bw40_g_band));
 
 	/* per-rate power delta */
-	DBGPRINT(RT_DEBUG_OFF, ("\n===================================\n"));
+	//DBGPRINT(RT_DEBUG_OFF, ("\n===================================\n"));
 	DBGPRINT(RT_DEBUG_OFF, ("per-rate power delta\n"));
-	DBGPRINT(RT_DEBUG_OFF, ("===================================\n"));
+	//DBGPRINT(RT_DEBUG_OFF, ("===================================\n"));
 	DBGPRINT(RT_DEBUG_OFF, ("tx_pwr_cck_1_2 = %d\n", cap->tx_pwr_cck_1_2));
 	DBGPRINT(RT_DEBUG_OFF, ("tx_pwr_cck_5_11 = %d\n", cap->tx_pwr_cck_5_11));
 	DBGPRINT(RT_DEBUG_OFF, ("tx_pwr_g_band_ofdm_6_9 = %d\n", cap->tx_pwr_g_band_ofdm_6_9));
@@ -824,9 +824,9 @@ static VOID mt7603_show_pwr_info(RTMP_ADAPTER *pAd)
 	DBGPRINT(RT_DEBUG_OFF, ("tx_pwr_ht_64qam_mcs_7_15 = %d\n", cap->tx_pwr_ht_64qam_mcs_7_15));
 
 	/* TMAC POWER INFO */
-	DBGPRINT(RT_DEBUG_OFF, ("\n===================================\n"));
+	//DBGPRINT(RT_DEBUG_OFF, ("\n===================================\n"));
 	DBGPRINT(RT_DEBUG_OFF, ("per-rate power delta in MAC 0x60130020 ~ 0x60130030\n"));
-	DBGPRINT(RT_DEBUG_OFF, ("===================================\n"));
+	//DBGPRINT(RT_DEBUG_OFF, ("===================================\n"));
 	RTMP_IO_READ32(pAd, TMAC_FP0R0, &value);
 	DBGPRINT(RT_DEBUG_OFF, ("TMAC_FP0R0 = 0x%x\n", value));
 	RTMP_IO_READ32(pAd, TMAC_FP0R1, &value);
@@ -839,9 +839,9 @@ static VOID mt7603_show_pwr_info(RTMP_ADAPTER *pAd)
 	DBGPRINT(RT_DEBUG_OFF, ("TMAC_FP0R4 = 0x%x\n", value));
 
 	/* TSSI info */
-	DBGPRINT(RT_DEBUG_OFF, ("\n===================================\n"));
+	//DBGPRINT(RT_DEBUG_OFF, ("\n===================================\n"));
 	DBGPRINT(RT_DEBUG_OFF, ("TSSI info\n"));
-	DBGPRINT(RT_DEBUG_OFF, ("===================================\n"));
+	//DBGPRINT(RT_DEBUG_OFF, ("===================================\n"));
 	DBGPRINT(RT_DEBUG_OFF, ("TSSI enable = %d\n", pAd->chipCap.tssi_enable));
 	DBGPRINT(RT_DEBUG_OFF, ("tssi_0_slope_g_band = 0x%x\n", cap->tssi_0_slope_g_band));
 	DBGPRINT(RT_DEBUG_OFF, ("tssi_1_slope_g_band = 0x%x\n", cap->tssi_1_slope_g_band));
