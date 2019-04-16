@@ -746,7 +746,7 @@ VOID ApMlmeDynamicTxRateSwitchingAGS(
 					__FUNCTION__, CurrRateIdx,
 					pEntry->TxQuality[CurrRateIdx]));
 			
-		if (AGSStatisticsInfo.TxErrorRatio >= TrainDown) /* Poor quality */
+		if (AGSStatisticsInfo.TxErrorRatio > TrainDown) /* Poor quality */
 		{
 			/* error ratio too high, do rate down */
 			DBGPRINT_RAW(RT_DEBUG_INFO | DBG_FUNC_RA,
@@ -834,7 +834,7 @@ VOID ApMlmeDynamicTxRateSwitchingAGS(
 	if ((pEntry->CurrTxRateIndex != CurrRateIdx) && 
 	     (pEntry->LastSecTxRateChangeAction == RATE_UP))
 	{
-		DBGPRINT_RAW(RT_DEBUG_INFO | DBG_FUNC_RA, ("%s: AGS: ++TX rate from %d to %d\n", 
+		DBGPRINT_RAW(RT_DEBUG_OFF | DBG_FUNC_RA, ("%s: AGS: ++TX rate from %d to %d\n", 
 			__FUNCTION__, CurrRateIdx, pEntry->CurrTxRateIndex));
 		
 		pEntry->LastSecTxRateChangeAction = RATE_UP;
@@ -846,7 +846,7 @@ VOID ApMlmeDynamicTxRateSwitchingAGS(
 	else if ((pEntry->CurrTxRateIndex != CurrRateIdx) && 
 	             (pEntry->LastSecTxRateChangeAction == RATE_DOWN))
 	{
-		DBGPRINT_RAW(RT_DEBUG_INFO | DBG_FUNC_RA, ("%s: AGS: --TX rate from %d to %d\n", 
+		DBGPRINT_RAW(RT_DEBUG_OFF | DBG_FUNC_RA, ("%s: AGS: --TX rate from %d to %d\n", 
 			__FUNCTION__, CurrRateIdx, pEntry->CurrTxRateIndex));
 		
 		pEntry->LastSecTxRateChangeAction = RATE_DOWN;
@@ -1041,7 +1041,7 @@ VOID ApQuickResponeForRateUpExecAGS(
 		else
 			ratio = 4;
 
-		if (AGSStatisticsInfo.TxErrorRatio >= TrainDown) /* Poor quality */
+		if (AGSStatisticsInfo.TxErrorRatio > TrainDown) /* Poor quality */
 			pEntry->TxQuality[CurrRateIdx] = AGS_TX_QUALITY_WORST_BOUND;
 
 		pEntry->PER[CurrRateIdx] = (UCHAR)(AGSStatisticsInfo.TxErrorRatio);
@@ -1140,7 +1140,7 @@ VOID ApQuickResponeForRateUpExecAGS(
 	if ((pEntry->CurrTxRateIndex != CurrRateIdx) && 
 	     (pEntry->LastSecTxRateChangeAction == 2)) /* Tx rate up */
 	{
-		DBGPRINT_RAW(RT_DEBUG_INFO | DBG_FUNC_RA, ("%s: QuickAGS: ++TX rate from %d to %d\n", 
+		DBGPRINT_RAW(RT_DEBUG_OFF | DBG_FUNC_RA, ("%s: QuickAGS: ++TX rate from %d to %d\n", 
 			__FUNCTION__, CurrRateIdx, pEntry->CurrTxRateIndex));	
 		
 		pEntry->TxQuality[pEntry->CurrTxRateIndex] = 0; /*restore the TxQuality from max to 0 */
@@ -1149,7 +1149,7 @@ VOID ApQuickResponeForRateUpExecAGS(
 	else if ((pEntry->CurrTxRateIndex != CurrRateIdx) && 
 	            (pEntry->LastSecTxRateChangeAction == 1)) /* Tx rate down */
 	{
-		DBGPRINT_RAW(RT_DEBUG_INFO | DBG_FUNC_RA, ("%s: QuickAGS: --TX rate from %d to %d\n", 
+		DBGPRINT_RAW(RT_DEBUG_OFF | DBG_FUNC_RA, ("%s: QuickAGS: --TX rate from %d to %d\n", 
 			__FUNCTION__, CurrRateIdx, pEntry->CurrTxRateIndex));
 		
 		pEntry->TxQuality[pEntry->CurrTxRateIndex] = 0;
