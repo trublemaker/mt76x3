@@ -8923,7 +8923,7 @@ VOID RTMPIoctlStatistics(RTMP_ADAPTER *pAd, RTMP_IOCTL_INPUT_STRUCT *wrq)
 #endif /* DBG_CTRL_SUPPORT */
 #endif /* defined(TXBF_SUPPORT) && defined(ENHANCED_STAT_DISPLAY) */
 
-    DBGPRINT(RT_DEBUG_TRACE, ("<==RTMPIoctlStatistics\n"));
+    DBGPRINT(RT_DEBUG_LOUD, ("<==RTMPIoctlStatistics\n"));
 }
 
 

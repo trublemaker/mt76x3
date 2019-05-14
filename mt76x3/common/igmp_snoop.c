@@ -233,7 +233,7 @@ BOOLEAN MulticastFilterTableInsertEntry(
 		{
 			if (MAC_ADDR_EQUAL(pMemberAddr, pMemberEntry->Addr))
 			{
-				DBGPRINT(RT_DEBUG_TRACE, ("%s: already in Members list.\n", __FUNCTION__));
+				DBGPRINT(RT_DEBUG_LOUD, ("%s: already in Members list.\n", __FUNCTION__));
 				return FALSE;
 			}
 
@@ -576,7 +576,7 @@ VOID IGMPSnooping(
 		pIgmpHeader = pIpHeader + 2 + IpHeaderLen;
 		IgmpVerType = (UCHAR)(*(pIgmpHeader));
 
-		DBGPRINT(RT_DEBUG_TRACE, ("IGMP type=%0x\n", IgmpVerType));
+		DBGPRINT(RT_DEBUG_LOUD, ("IGMP type=%0x\n", IgmpVerType));
 
 		switch(IgmpVerType)
 		{
@@ -584,7 +584,7 @@ VOID IGMPSnooping(
 		case IGMP_V2_MEMBERSHIP_REPORT: /* IGMP version 2 membership report. */
 			pGroupIpAddr = (PUCHAR)(pIgmpHeader + 4);
 				ConvertMulticastIP2MAC(pGroupIpAddr, (PUCHAR *)&pGroupMacAddr, ETH_P_IP);
-			DBGPRINT(RT_DEBUG_TRACE, ("IGMP Group=%02x:%02x:%02x:%02x:%02x:%02x\n",
+			DBGPRINT(RT_DEBUG_LOUD, ("IGMP Group=%02x:%02x:%02x:%02x:%02x:%02x\n",
 				GroupMacAddr[0], GroupMacAddr[1], GroupMacAddr[2], GroupMacAddr[3], GroupMacAddr[4], GroupMacAddr[5]));
 			MulticastFilterTableInsertEntry(pAd, GroupMacAddr, pSrcMacAddr, pDev, MCAT_FILTER_DYNAMIC);
 			break;
@@ -592,7 +592,7 @@ VOID IGMPSnooping(
 		case IGMP_LEAVE_GROUP: /* IGMP version 1 and version 2 leave group. */
 			pGroupIpAddr = (PUCHAR)(pIgmpHeader + 4);
 				ConvertMulticastIP2MAC(pGroupIpAddr, (PUCHAR *)&pGroupMacAddr, ETH_P_IP);
-			DBGPRINT(RT_DEBUG_TRACE, ("IGMP Group=%02x:%02x:%02x:%02x:%02x:%02x\n",
+			DBGPRINT(RT_DEBUG_LOUD, ("IGMP Group=%02x:%02x:%02x:%02x:%02x:%02x\n",
 				GroupMacAddr[0], GroupMacAddr[1], GroupMacAddr[2], GroupMacAddr[3], GroupMacAddr[4], GroupMacAddr[5]));
 			MulticastFilterTableDeleteEntry(pAd, GroupMacAddr, pSrcMacAddr, pDev, MCAT_FILTER_DYNAMIC);
 			break;
@@ -606,10 +606,10 @@ VOID IGMPSnooping(
 				AuxDataLen = (UCHAR)(*(pGroup + 1));
 				numOfSources = ntohs(*((UINT16 *)(pGroup + 2)));
 				pGroupIpAddr = (PUCHAR)(pGroup + 4);
-				DBGPRINT(RT_DEBUG_TRACE, ("IGMPv3 Type=%d, ADL=%d, numOfSource=%d\n", 
+				DBGPRINT(RT_DEBUG_LOUD, ("IGMPv3 Type=%d, ADL=%d, numOfSource=%d\n", 
 								GroupType, AuxDataLen, numOfSources));
 				ConvertMulticastIP2MAC(pGroupIpAddr, (PUCHAR *)&pGroupMacAddr, ETH_P_IP);
-				DBGPRINT(RT_DEBUG_TRACE, ("IGMP Group=%02x:%02x:%02x:%02x:%02x:%02x\n",
+				DBGPRINT(RT_DEBUG_LOUD, ("IGMP Group=%02x:%02x:%02x:%02x:%02x:%02x\n",
 					GroupMacAddr[0], GroupMacAddr[1], GroupMacAddr[2], 
 					GroupMacAddr[3], GroupMacAddr[4], GroupMacAddr[5]));
 
@@ -639,7 +639,7 @@ VOID IGMPSnooping(
 			break;
 
 		default:
-			DBGPRINT(RT_DEBUG_TRACE, ("unknow IGMP Type=%d\n", IgmpVerType));
+			DBGPRINT(RT_DEBUG_LOUD, ("unknow IGMP Type=%d\n", IgmpVerType));
 			break;
 		}
 	}
@@ -672,7 +672,7 @@ static VOID InsertIgmpMember(
 		COPY_MAC_ADDR(pMemberEntry->Addr, pMemberAddr);
 		insertTailList(pList, (RT_LIST_ENTRY *)pMemberEntry);
 
-		DBGPRINT(RT_DEBUG_TRACE, ("%s Member Mac=%02x:%02x:%02x:%02x:%02x:%02x\n", __FUNCTION__,
+		DBGPRINT(RT_DEBUG_LOUD, ("%s Member Mac=%02x:%02x:%02x:%02x:%02x:%02x\n", __FUNCTION__,
 			pMemberEntry->Addr[0], pMemberEntry->Addr[1], pMemberEntry->Addr[2],
 			pMemberEntry->Addr[3], pMemberEntry->Addr[4], pMemberEntry->Addr[5]));
 	}

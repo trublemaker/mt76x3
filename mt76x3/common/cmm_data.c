@@ -4044,7 +4044,7 @@ VOID RTMP_RxPacketClassify(
 	{
 		pRxBlk->CriticalPkt = 1;	// ARP
 
-		DBGPRINT(RT_DEBUG_WARN, ("rx path ARP #(aid=%d,wcid=%d, pHeader seq=%d, ampdu = %d)\n",
+		DBGPRINT(RT_DEBUG_LOUD, ("rx path ARP #(aid=%d,wcid=%d, pHeader seq=%d, ampdu = %d)\n",
 			pEntry->Aid, pRxBlk->wcid, pRxBlk->pHeader->Sequence, RX_BLK_TEST_FLAG(pRxBlk, fRX_AMPDU))); 
 	}
 	else if (protoType == ETH_P_IP)
@@ -4056,7 +4056,7 @@ VOID RTMP_RxPacketClassify(
 		{
 			pRxBlk->CriticalPkt = 1;	// ICMP
 
-			DBGPRINT(RT_DEBUG_WARN, ("rx path ICMP #(aid=%d,wcid=%d, pHeader seq=%d, ampdu = %d)\n",
+			DBGPRINT(RT_DEBUG_LOUD, ("rx path ICMP #(aid=%d,wcid=%d, pHeader seq=%d, ampdu = %d)\n",
 				pEntry->Aid, pRxBlk->wcid, pRxBlk->pHeader->Sequence, RX_BLK_TEST_FLAG(pRxBlk, fRX_AMPDU)));
 		}
 #if 0
@@ -4571,7 +4571,7 @@ INT TxOPUpdatingAlgo(RTMP_ADAPTER *pAd)
                 {
                     if ((TxTotalByteCnt/RxTotalByteCnt) >= pAd->CommonCfg.ManualTxopUpBound)
                     { /* Boundary unit is Ratio */
-                        DBGPRINT(RT_DEBUG_TRACE, ("(Ratio: %lu >= %d) Should be enable TxOP to 0x60\n", 
+                        DBGPRINT(RT_DEBUG_INFO, ("(Ratio: %lu >= %d) Should be enable TxOP to 0x60\n", 
                                 TxTotalByteCnt/RxTotalByteCnt, pAd->CommonCfg.ManualTxopUpBound));
 			    UpdateTxOP = 0x60; // Tx
                     }
@@ -4583,14 +4583,14 @@ INT TxOPUpdatingAlgo(RTMP_ADAPTER *pAd)
                         }
                         else
                         {
-                            DBGPRINT(RT_DEBUG_TRACE, ("(Ratio: %lu <= %d) Should be disable TxOP to 0x0\n", 
+                            DBGPRINT(RT_DEBUG_INFO, ("(Ratio: %lu <= %d) Should be disable TxOP to 0x0\n", 
                                         TxTotalByteCnt/RxTotalByteCnt, pAd->CommonCfg.ManualTxopLowBound));
 				UpdateTxOP = 0x0;
                         }
                     } 
                     else
                     {
-                        DBGPRINT(RT_DEBUG_TRACE, ("(Ratio: %d < %lu < %d) Keep the last TxOP setting\n", 
+                        DBGPRINT(RT_DEBUG_INFO, ("(Ratio: %d < %lu < %d) Keep the last TxOP setting\n", 
                                 pAd->CommonCfg.ManualTxopLowBound, TxTotalByteCnt/RxTotalByteCnt, pAd->CommonCfg.ManualTxopUpBound));
                     }
                 }
@@ -4598,7 +4598,7 @@ INT TxOPUpdatingAlgo(RTMP_ADAPTER *pAd)
                 {
                     if ((RxTotalByteCnt/TxTotalByteCnt) >= pAd->CommonCfg.ManualTxopUpBound)
                     { /* Boundary unit is Ratio */
-                        DBGPRINT(RT_DEBUG_TRACE, ("(Ratio: %lu >= %d) Should be enable TxOP to 0x60\n", 
+                        DBGPRINT(RT_DEBUG_INFO, ("(Ratio: %lu >= %d) Should be enable TxOP to 0x60\n", 
                                 RxTotalByteCnt/TxTotalByteCnt, pAd->CommonCfg.ManualTxopUpBound));
 						UpdateTxOP = 0x60;
                     }
@@ -4617,13 +4617,13 @@ INT TxOPUpdatingAlgo(RTMP_ADAPTER *pAd)
                     } 
                     else
                     {
-                        DBGPRINT(RT_DEBUG_TRACE, ("(Ratio: %d < %lu < %d) Keep the last TxOP setting\n", pAd->CommonCfg.ManualTxopLowBound, RxTotalByteCnt/TxTotalByteCnt, pAd->CommonCfg.ManualTxopUpBound));
+                        DBGPRINT(RT_DEBUG_INFO, ("(Ratio: %d < %lu < %d) Keep the last TxOP setting\n", pAd->CommonCfg.ManualTxopLowBound, RxTotalByteCnt/TxTotalByteCnt, pAd->CommonCfg.ManualTxopUpBound));
                     }
                 }
             }
             else
             {
-                DBGPRINT(RT_DEBUG_TRACE, ("Current TP=%lu < Threshold(%lu), turn-off TxOP\n", 
+                DBGPRINT(RT_DEBUG_INFO, ("Current TP=%lu < Threshold(%lu), turn-off TxOP\n", 
                         (((TxTotalByteCnt + RxTotalByteCnt) << 3) >> 20), pAd->CommonCfg.ManualTxopThreshold));
                 
 		  UpdateTxOP = 0x0;
@@ -4687,7 +4687,7 @@ INT TxOPUpdatingAlgo(RTMP_ADAPTER *pAd)
 		if (((UpdateTxOP == 0) || (UpdateTxOP == 0xFF)) &&
 	        ((pAd->StaTxopAbledCnt == 1) || (pAd->ApClientTxopAbledCnt == 1)))
 		{
-			DBGPRINT(RT_DEBUG_TRACE,("Hit the traffic rule with cnt ApClient[%d],STA[%d]\n", 
+			DBGPRINT(RT_DEBUG_INFO,("Hit the traffic rule with cnt ApClient[%d],STA[%d]\n", 
 					pAd->ApClientTxopAbledCnt, pAd->StaTxopAbledCnt));
 			UpdateTxOP = 0x60;
 		}

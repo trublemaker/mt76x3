@@ -1496,15 +1496,17 @@ static VOID HighTrafficRateAlg(RTMP_ADAPTER *pAd, MAC_TABLE_ENTRY *pEntry, MT_TX
 
 	HwAggRateIndex = pTxInfo->RateIndex;
 
-	DBGPRINT(RT_DEBUG_TRACE | DBG_FUNC_RA, ("TxTotalCnt = %d\n", TxTotalCnt));
-	DBGPRINT(RT_DEBUG_TRACE | DBG_FUNC_RA, ("Rate1 Tx Cnt = %d\n", pTxInfo->Rate1TxCnt));
-	DBGPRINT(RT_DEBUG_TRACE | DBG_FUNC_RA, ("Rate2 Tx Cnt = %d\n", pTxInfo->Rate2TxCnt));
-	DBGPRINT(RT_DEBUG_TRACE | DBG_FUNC_RA, ("Rate3 Tx Cnt = %d\n", pTxInfo->Rate3TxCnt));
-	DBGPRINT(RT_DEBUG_TRACE | DBG_FUNC_RA, ("Rate4 Tx Cnt = %d\n", pTxInfo->Rate4TxCnt));
-	DBGPRINT(RT_DEBUG_TRACE | DBG_FUNC_RA, ("Rate5 Tx Cnt = %d\n", pTxInfo->Rate5TxCnt));
-	DBGPRINT(RT_DEBUG_TRACE | DBG_FUNC_RA, ("Rate1 fail = %d\n", pTxInfo->Rate1FailCnt));
-	DBGPRINT(RT_DEBUG_TRACE | DBG_FUNC_RA, ("Rate1ErrorRatio = %d\n", Rate1ErrorRatio));
-	DBGPRINT(RT_DEBUG_TRACE | DBG_FUNC_RA, ("HwAggRateIndex = %d\n", HwAggRateIndex));
+	DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("TxTotalCnt = %d\t", TxTotalCnt));
+	DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("Rate1 Tx Cnt = %d\t", pTxInfo->Rate1TxCnt));
+	DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("Rate2 Tx Cnt = %d\t", pTxInfo->Rate2TxCnt));
+	DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("Rate3 Tx Cnt = %d\t", pTxInfo->Rate3TxCnt));
+	DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("Rate4 Tx Cnt = %d\t", pTxInfo->Rate4TxCnt));
+	DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("Rate5 Tx Cnt = %d\t", pTxInfo->Rate5TxCnt));
+	DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("HwAggRateIndex = %d\n", HwAggRateIndex));
+	if(Rate1ErrorRatio>40){
+		DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_RA, ("Rate1 fail = %d\t", pTxInfo->Rate1FailCnt));
+		DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_RA, ("Rate1ErrorRatio = %d\n", Rate1ErrorRatio));
+	}
 
 	/*
 		After pEntry->fLastSecAccordingRSSI = TRUE; the for loop
@@ -1535,7 +1537,7 @@ static VOID HighTrafficRateAlg(RTMP_ADAPTER *pAd, MAC_TABLE_ENTRY *pEntry, MT_TX
 	UpRateIdx = MlmeSelectUpRate(pAd, pEntry, pCurrTxRate);
 	DownRateIdx = MlmeSelectDownRate(pAd, pEntry, CurrRateIdx);
 
-	DBGPRINT(RT_DEBUG_TRACE | DBG_FUNC_RA, ("Average PER %d, Cur %x, Up %x, Dn %x\n", Rate1ErrorRatio
+	DBGPRINT(RT_DEBUG_LOUD | DBG_FUNC_RA, ("Average PER %d, Cur %x, Up %x, Dn %x\n", Rate1ErrorRatio
 								, CurrRateIdx, UpRateIdx, DownRateIdx));
 
 #ifdef DOT11_N_SUPPORT
