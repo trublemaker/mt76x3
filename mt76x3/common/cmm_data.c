@@ -4681,7 +4681,7 @@ INT TxOPUpdatingAlgo(RTMP_ADAPTER *pAd)
 	}
 
 #ifdef TRAFFIC_BASED_TXOP
-		DBGPRINT(RT_DEBUG_TRACE,("INFO:  %d the traffic rule with cnt ApClient[%d],STA[%d]\n", 
+		DBGPRINT(RT_DEBUG_INFO,("INFO:  %d the traffic rule with cnt ApClient[%d],STA[%d]\n", 
 				UpdateTxOP, pAd->ApClientTxopAbledCnt, pAd->StaTxopAbledCnt));
 		/* Traffic Base Txop Rule */
 		if (((UpdateTxOP == 0) || (UpdateTxOP == 0xFF)) &&

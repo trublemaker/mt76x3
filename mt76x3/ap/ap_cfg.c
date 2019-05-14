@@ -6255,7 +6255,7 @@ INT	Set_AP_WPAPSK_Proc(
 	INT	retval;
 	BSS_STRUCT *pMBSSStruct;
 
-	DBGPRINT(RT_DEBUG_TRACE, ("Set_WPAPSK_Proc::(WPAPSK=%s)\n", arg));
+	DBGPRINT(RT_DEBUG_LOUD, ("Set_WPAPSK_Proc::(WPAPSK=%s)\n", arg));
 
 	pMBSSStruct = &pAd->ApCfg.MBSSID[apidx];
 	retval = RT_CfgSetWPAPSKKey(pAd, arg, strlen(arg), (PUCHAR)pMBSSStruct->Ssid, pMBSSStruct->SsidLen, pMBSSStruct->PMK);
@@ -12747,7 +12747,7 @@ INT RTMP_AP_IoctlHandle(
 		case CMD_RTPRIV_IOCTL_AP_SIOCGIWAP:
 		{
 			UCHAR *pBssidDest = (UCHAR *)pData;
-			PCHAR pBssidStr;
+			PUCHAR pBssidStr;
 
 #ifdef APCLI_SUPPORT
 			if (Data == INT_APCLI)
