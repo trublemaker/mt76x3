@@ -92,3 +92,7 @@ config  MT76X3_AP_DLS
 	depends on MT76X3_AP
 	default n
 
+config MT76X3_AP_DEBUG
+	bool "Include Debug messages"
+	default n
+

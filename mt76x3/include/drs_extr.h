@@ -338,11 +338,11 @@ INT Show_AGS_Proc(struct _RTMP_ADAPTER *pAd, RTMP_STRING *arg);
 
 #ifdef CONFIG_AP_SUPPORT
 VOID ApMlmeDynamicTxRateSwitchingAGS(
-	IN RTMP_ADAPTER *pAd,
+	IN struct _RTMP_ADAPTER *pAd,
 	IN INT idx);
 
 VOID ApQuickResponeForRateUpExecAGS(
-	IN RTMP_ADAPTER *pAd,
+	IN struct _RTMP_ADAPTER *pAd,
 	IN INT idx);
 #endif /* CONFIG_AP_SUPPORT */
 #endif /* AGS_SUPPORT */

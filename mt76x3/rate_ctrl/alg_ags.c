@@ -1080,8 +1080,11 @@ VOID ApQuickResponeForRateUpExecAGS(
 				{
 					if (pTable == AGS3x3HTRateTable)
 						pEntry->AGSCtrl.MCSGroup = 3;
-					else if ((pTable == AGS2x2HTRateTable) || 
-					            (pTable == Ags2x2VhtRateTable))
+					else if ((pTable == AGS2x2HTRateTable)
+		#ifdef DOT11_VHT_AC
+					           || (pTable == Ags2x2VhtRateTable)
+		#endif //DOT11_VHT_AC
+						)					
 						pEntry->AGSCtrl.MCSGroup = 2;
 					else
 						pEntry->AGSCtrl.MCSGroup = 1;
