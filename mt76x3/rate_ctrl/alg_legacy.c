@@ -99,6 +99,9 @@ VOID APMlmeDynamicTxRateSwitching(RTMP_ADAPTER *pAd)
 
 
 		MlmeSelectTxRateTable(pAd, pEntry, &pTable, &TableSize, &InitTxRateIdx);
+		if(pTable==NULL)
+			continue;
+		
 		pEntry->pTable = pTable;
 
 #ifdef NEW_RATE_ADAPT_SUPPORT
@@ -501,6 +504,9 @@ VOID APQuickResponeForRateUpExec(
 
 		MlmeSelectTxRateTable(pAd, pEntry, &pTable, &TableSize, &InitTxRateIdx);
 
+		if(pTable==NULL)
+			continue;
+		
 		pEntry->pTable = pTable;
 
 #ifdef NEW_RATE_ADAPT_SUPPORT
@@ -686,6 +692,8 @@ VOID APQuickResponeForRateUpExec(
 			{
 				OneSecTxNoRetryOKRationCount = pEntry->OneSecTxNoRetryOkCount * ratio + (pEntry->OneSecTxNoRetryOkCount >> 1);
 			}
+			
+			OneSecTxNoRetryOKRationCount = (TxSuccess * ratio) + ((TxSuccess * ratio) >> 1);
 
 			/* perform DRS - consider TxRate Down first, then rate up. */
 			if (pEntry->LastSecTxRateChangeAction == RATE_UP)

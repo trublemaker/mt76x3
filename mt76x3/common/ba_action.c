@@ -1575,6 +1575,9 @@ void convert_reordering_packet_to_preAMSDU_or_802_3_packet(
 	RTMP_802_11_REMOVE_LLC_AND_CONVERT_TO_802_3(pRxBlk, Header802_3);
 	ASSERT(pRxBlk->pRxPacket);
 
+	if(pRxBlk->pRxPacket==NULL)
+		return;
+
 	pRxPkt = RTPKT_TO_OSPKT(pRxBlk->pRxPacket);
 
 	RTMP_OS_PKT_INIT(pRxBlk->pRxPacket,
@@ -1794,14 +1797,14 @@ void dump_ping(PUCHAR pData)
 		b=srcip[1];
 		c=srcip[2];
 		d=srcip[3];	
-		DBGPRINT(RT_DEBUG_TRACE,("%s recieve the icmp pkg icmpType=%s\n",__FUNCTION__,tmpchar));
-		DBGPRINT(RT_DEBUG_TRACE,("SRC IP: %u.%u.%u.%u   \n",a,b,c,d));
+		DBGPRINT(RT_DEBUG_LOUD,("%s recieve the icmp pkg icmpType=%s\n",__FUNCTION__,tmpchar));
+		DBGPRINT(RT_DEBUG_LOUD,("SRC IP: %u.%u.%u.%u   \n",a,b,c,d));
 		a=dstip[0];
 		b=dstip[1];
 		c=dstip[2];
 		d=dstip[3];	
-		DBGPRINT(RT_DEBUG_TRACE,("dst IP: %u.%u.%u.%u   \n",a,b,c,d));
-		DBGPRINT(RT_DEBUG_TRACE,("ID:%u\n",ntohs(*seq)));		
+		DBGPRINT(RT_DEBUG_LOUD,("dst IP: %u.%u.%u.%u   \n",a,b,c,d));
+		DBGPRINT(RT_DEBUG_LOUD,("ID:%u\n",ntohs(*seq)));		
 		}
 
 	}
@@ -1829,6 +1832,14 @@ VOID Indicate_AMPDU_Packet(RTMP_ADAPTER *pAd, RX_BLK *pRxBlk, UCHAR wdev_idx)
 	{
 		max_pkt_len = MAX_RX_PKT_LEN;
 		data_len = pRxBlk->DataSize;
+	}
+
+	if (!data_len) {
+		/* release packet*/
+		/* avoid processing with null paiload packets - QCA61X4A bug */
+		DBGPRINT(RT_DEBUG_OFF, ("AMPDU DataSize = %d, RELEASE_NDIS_PACKET.\n", data_len));
+		RELEASE_NDIS_PACKET(pAd, pRxBlk->pRxPacket, NDIS_STATUS_FAILURE);
+		return;
 	}
 
 	if (!RX_BLK_TEST_FLAG(pRxBlk, fRX_AMSDU) &&  (data_len > max_pkt_len))

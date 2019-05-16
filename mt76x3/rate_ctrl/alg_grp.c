@@ -942,7 +942,7 @@ VOID MlmeNewRateAdapt(
 	RTMP_RA_GRP_TB *pCurrTxRate = PTX_RA_GRP_ENTRY(pTable, CurrRateIdx);
 
 	pEntry->LastSecTxRateChangeAction = RATE_NO_CHANGE;
-
+	pEntry->lastRateIdx = CurrRateIdx;
 
 	if (TxErrorRatio >= TrainDown)
 	{
@@ -1368,6 +1368,11 @@ VOID QuickResponeForRateUpExecAdaptMT(/* actually for both up and down */
 		else if (pAd->CommonCfg.TrainUpRule==2 && Rssi<=pAd->CommonCfg.TrainUpRuleRSSI)
 		{
 			useOldRate = MlmeRAHybridRule(pAd, pEntry, pCurrTxRate, OneSecTxNoRetryOKRationCount, TxErrorRatio);
+			if ((useOldRate== TRUE) && ((Rate1ErrorRatio < 21) && (TxTotalCnt <= 50)))
+			{
+				// make low rate raise up easily 
+				useOldRate = FALSE;
+			}
 		}
 		else if (pAd->CommonCfg.TrainUpRule==3 && Rssi<=pAd->CommonCfg.TrainUpRuleRSSI)
 		{
@@ -1379,7 +1384,7 @@ VOID QuickResponeForRateUpExecAdaptMT(/* actually for both up and down */
 		if (useOldRate)
 		{
 			/*  If PER>50% or TP<lastTP/2 then double the TxQuality delay */
-			if ((TxErrorRatio > 50) || (OneSecTxNoRetryOKRationCount < pEntry->LastTxOkCount/2))
+			if ((TxErrorRatio > 40) || (OneSecTxNoRetryOKRationCount < pEntry->LastTxOkCount/2))
 				MlmeSetTxQuality(pEntry, CurrRateIdx, DRS_TX_QUALITY_WORST_BOUND*2);
 			else
 				MlmeSetTxQuality(pEntry, CurrRateIdx, DRS_TX_QUALITY_WORST_BOUND);

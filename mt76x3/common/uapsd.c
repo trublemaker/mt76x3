@@ -1523,8 +1523,13 @@ VOID UAPSD_SP_CloseInRVDone(RTMP_ADAPTER *pAd)
 	/* check for all CLIENT's UAPSD Service Period */
 	for(IdEntry = FirstWcid; IdEntry < MAX_LEN_OF_MAC_TABLE; IdEntry++)
 	{
-		MAC_TABLE_ENTRY *pEntry = &pAd->MacTab.Content[IdEntry];
+		MAC_TABLE_ENTRY *pEntry = NULL;//&pAd->MacTab.Content[IdEntry];
 		ULONG flags = 0;
+
+		if (IdEntry >= MAX_LEN_OF_MAC_TABLE)
+			break;
+		
+		pEntry = &pAd->MacTab.Content[IdEntry];
 
 		UAPSD_SEM_LOCK(&pAd->UAPSDEOSPLock, flags);
 
@@ -2312,14 +2317,14 @@ VOID UAPSD_TriggerFrameHandle(RTMP_ADAPTER *pAd, MAC_TABLE_ENTRY *pEntry, UCHAR 
 	{
 		/* if no data needs to tx, respond with QosNull for the trigger frame */
 		pEntry->pUAPSDEOSPFrame = NULL;
-		pEntry->UAPSDTxNum = TxPktNum;
+		pEntry->UAPSDTxNum = 0;//TxPktNum;
 #ifdef MT_PS
 		tr_entry->bEospNullSnd = FALSE;
 #endif /* MT_PS */
 
 		if (TxPktNum == 0)
 		{
-			pEntry->UAPSDTxNum = 0;
+			//pEntry->UAPSDTxNum = 0;
 #ifdef MT_PS
 			if ((pAd->chipCap.hif_type == HIF_MT) &&
 				(tr_entry->ps_state != APPS_RETRIEVE_IDLE) &&

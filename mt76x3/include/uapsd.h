@@ -303,7 +303,7 @@
 		Suspend SP handle before rx done and resume SP handle after rx done.
 */
 // TODO: shiang-usw, why PCI need to disable this when run P2P Sigma 6.1.12???
-#define UAPSD_SP_ACCURATE		/* use more accurate method to send EOSP */
+//#define UAPSD_SP_ACCURATE		/* use more accurate method to send EOSP */
 
 #endif /* RTMP_MAC_PCI */
 

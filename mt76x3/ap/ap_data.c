@@ -399,10 +399,11 @@ INT APSendPacket(RTMP_ADAPTER *pAd, PNDIS_PACKET pPacket)
 			}
 		}
 #endif /* MT_MAC */
-		
+
 #ifdef UAPSD_SUPPORT
 		if (IS_ENTRY_CLIENT(tr_entry) 
 			&& (tr_entry->PsMode == PWR_SAVE)
+			&& (wcid < MAX_LEN_OF_MAC_TABLE) //CONFIG_RT_MAX_CLIENTS=64
 			&& UAPSD_MR_IS_UAPSD_AC(&pAd->MacTab.Content[wcid], QueIdx))
 		{
 			UAPSD_PacketEnqueue(pAd, &pAd->MacTab.Content[wcid], pPacket, QueIdx, FALSE);
@@ -3184,7 +3185,7 @@ BOOLEAN APChkCls2Cls3Err(RTMP_ADAPTER *pAd, UCHAR wcid, HEADER_802_11 *hdr)
 					wcid, MAX_LEN_OF_MAC_TABLE));
 //+++Add by shiang for debug
 		pEntry = MacTableLookup(pAd, hdr->Addr2);
-		if (pEntry)
+		if (pEntry && IS_ENTRY_CLIENT(pEntry))
 			return FALSE;
 //---Add by shiang for debug
 
@@ -3600,7 +3601,7 @@ INT ap_rx_pkt_allow(RTMP_ADAPTER *pAd, RX_BLK *pRxBlk)
 #endif /* RLT_MAC_DBG */
 //---Add by shiang for debug
 
-	if(pAd->ApCfg.BANClass3Data == TRUE)
+	if(pAd && pAd->ApCfg.BANClass3Data == TRUE)
 		return FALSE;
 
 #ifdef STATS_COUNT_SUPPORT

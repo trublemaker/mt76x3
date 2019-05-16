@@ -544,6 +544,10 @@ VOID Indicate_ARalink_Packet(
 
 	ASSERT(pRxBlk->pRxPacket);
 
+	if(!pRxBlk->pRxPacket){
+		RELEASE_NDIS_PACKET(pAd, pRxBlk->pRxPacket, NDIS_STATUS_FAILURE);
+	}
+
 	pAd->RalinkCounters.OneSecRxARalinkCnt++;
 	Payload1Size = pRxBlk->DataSize - Msdu2Size;
 	Payload2Size = Msdu2Size - LENGTH_802_3;
@@ -641,7 +645,8 @@ PNDIS_PACKET RTMPDeFragmentDataFrame(RTMP_ADAPTER *pAd, RX_BLK *pRxBlk)
 		{
 			/* Fragment frame is too large, it exeeds the maximum frame size.*/
 			/* Reset Fragment control blk*/
-			RESET_FRAGFRAME(pAd->FragFrame);
+			if (pHeader->Sequence != pAd->FragFrame.Sequence)
+				RESET_FRAGFRAME(pAd->FragFrame);
 			DBGPRINT(RT_DEBUG_ERROR, ("Fragment frame is too large, it exeeds the maximum frame size.\n"));
 			goto done;
 		}
@@ -669,7 +674,8 @@ PNDIS_PACKET RTMPDeFragmentDataFrame(RTMP_ADAPTER *pAd, RX_BLK *pRxBlk)
 
 done:
 	/* always release rx fragmented packet*/
-	RELEASE_NDIS_PACKET(pAd, pRxPacket, NDIS_STATUS_FAILURE);
+	RELEASE_NDIS_PACKET(pAd, pRxBlk->pRxPacket, NDIS_STATUS_FAILURE);
+	pRxBlk->pRxPacket = NULL;
 
 	/* return defragmented packet if packet is reassembled completely*/
 	/* otherwise return NULL*/
@@ -1174,10 +1180,10 @@ VOID dev_rx_ctrl_frm(RTMP_ADAPTER *pAd, RX_BLK *pRxBlk)
 				}
 #endif /* MT_MAC */
 
-
-               //printk("dev_rx_ctrl_frm0 SUBTYPE_PS_POLL pRxBlk->wcid: %x pEntry->wcid:%x\n",pRxBlk->wcid,pEntry->wcid);
+				DBGPRINT(RT_DEBUG_ERROR, ("----dev_rx_ctrl_frm0 SUBTYPE_PS_POLL pRxBlk->wcid: %x pEntry->wcid:-- \n",
+							pRxBlk->wcid ));
 				if (pRxBlk->wcid < MAX_LEN_OF_MAC_TABLE) {
-                                 //printk("dev_rx_ctrl_frm1 SUBTYPE_PS_POLL\n");
+                    //printk("dev_rx_ctrl_frm1 SUBTYPE_PS_POLL\n");
 					pEntry = &pAd->MacTab.Content[pRxBlk->wcid];
 					if (pEntry->Aid == Aid)
 						RtmpHandleRxPsPoll(pAd, pAddr, pRxBlk->wcid, FALSE);
@@ -2516,9 +2522,6 @@ BOOLEAN rtmp_rx_done_handle(RTMP_ADAPTER *pAd)
 										pAd->CommonCfg.DebugFlags);
 #endif /* INCLUDE_DEBUG_QUEUE */
 #endif /* DBG_CTRL_SUPPORT */
-
-
-
 
 		/* Increase Total receive byte counter after real data received no mater any error or not */
 		pAd->RalinkCounters.ReceivedByteCount += rxblk.DataSize;

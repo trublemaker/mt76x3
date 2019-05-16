@@ -941,8 +941,12 @@ NDIS_STATUS MiniportMMRequest(RTMP_ADAPTER *pAd, UCHAR QueIdx, UCHAR *pData, UIN
 		if (bUseDataQ)
 		{
 			/* free Tx(QueIdx) resources*/
-			RTMPFreeTXDUponTxDmaDone(pAd, QueIdx);
 			FreeNum = GET_TXRING_FREENO(pAd, QueIdx);
+			if (FreeNum <= 5)
+			{
+				/* free Tx(QueIdx) resources*/
+				RTMPFreeTXDUponTxDmaDone(pAd, QueIdx);
+			}
 		}
 		else
 #endif /* RTMP_MAC_PCI */
@@ -3014,7 +3018,7 @@ INT deq_mgmt_frame(RTMP_ADAPTER *pAd, PNDIS_PACKET pkt, UCHAR qIdx, BOOLEAN bLoc
 								fRTMP_ADAPTER_NIC_NOT_EXIST |\
 								fRTMP_ADAPTER_DISABLE_DEQUEUEPACKET)
 
-#define ENTRY_RETRY_INTERVAL	(100 * OS_HZ / 1000)
+#define ENTRY_RETRY_INTERVAL	(80 * OS_HZ / 1000)
 static inline BOOLEAN traffic_jam_chk(RTMP_ADAPTER *pAd, STA_TR_ENTRY *tr_entry)
 {
 	BOOLEAN drop_it = FALSE;
@@ -3311,7 +3315,7 @@ start_kick:
 
 	========================================================================
 */
-VOID RTMPDeQueuePacket(
+inline VOID RTMPDeQueuePacket(
 	IN RTMP_ADAPTER *pAd,
 	IN BOOLEAN in_hwIRQ,
 	IN UCHAR QIdx,
@@ -3322,7 +3326,7 @@ VOID RTMPDeQueuePacket(
 	INT Count = 0, round  = 0;
 	TX_BLK TxBlk, *pTxBlk = &TxBlk;
 	UCHAR QueIdx = 0;
-	unsigned long	IrqFlags = 0;
+	ULONG IrqFlags = 0;
 	struct dequeue_info deq_info = {0};
 
 #ifdef DATA_QUEUE_RESERVE
@@ -3350,10 +3354,10 @@ VOID RTMPDeQueuePacket(
 		round++;
 
 		DEQUEUE_LOCK(&pAd->irq_lock, in_hwIRQ, IrqFlags);
-
 		rtmp_deq_req(pAd, max_cnt, &deq_info);
+		DEQUEUE_UNLOCK(&pAd->irq_lock, in_hwIRQ, IrqFlags);
+		
 		if (deq_info.status == NDIS_STATUS_FAILURE) {
-			DEQUEUE_UNLOCK(&pAd->irq_lock, in_hwIRQ, IrqFlags);
 			break;
 		}
 
@@ -3368,13 +3372,23 @@ VOID RTMPDeQueuePacket(
 
 		RTMP_START_DEQUEUE(pAd, QueIdx, IrqFlags);
 
+		DEQUEUE_LOCK(&pAd->irq_lock, in_hwIRQ, IrqFlags);
 		deq_packet_gatter(pAd, &deq_info, pTxBlk, in_hwIRQ);
+		DEQUEUE_UNLOCK(&pAd->irq_lock, in_hwIRQ, IrqFlags);
+		
 		if (pTxBlk->TotalFrameNum) {
 #ifdef DATA_QUEUE_RESERVE
 			real_tx += pTxBlk->TotalFrameNum;
 #endif /* DATA_QUEUE_RESERVE */
 			ASSERT(pTxBlk->wdev);
 			ASSERT(pTxBlk->wdev->wdev_hard_tx);
+
+			if (pTxBlk->wdev)
+				ASSERT(pTxBlk->wdev->wdev_hard_tx);
+
+			if (IS_PCI_INF(pAd) || IS_RBUS_INF(pAd))
+				DEQUEUE_LOCK(&pAd->irq_lock, in_hwIRQ, IrqFlags);
+			
 			if (pTxBlk->wdev && pTxBlk->wdev->wdev_hard_tx) {
 				pTxBlk->wdev->wdev_hard_tx(pAd, pTxBlk);
 			}
@@ -3389,14 +3403,17 @@ VOID RTMPDeQueuePacket(
 					/*Status =*/ APHardTransmit(pAd, pTxBlk);
 #endif /* CONFIG_AP_SUPPORT */
 			}
+			
+			if (IS_PCI_INF(pAd) || IS_RBUS_INF(pAd))
+				DEQUEUE_UNLOCK(&pAd->irq_lock, in_hwIRQ, IrqFlags);
 
 			Count += pTxBlk->TotalFrameNum;
 		}
 
 		RTMP_STOP_DEQUEUE(pAd, QueIdx, IrqFlags);
 
+		DEQUEUE_LOCK(&pAd->irq_lock, in_hwIRQ, IrqFlags);
 		rtmp_deq_report(pAd, &deq_info);
-
 		DEQUEUE_UNLOCK(&pAd->irq_lock, in_hwIRQ, IrqFlags);
 
 		DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_TXQ, ("%s(): deq_packet_gatter %s, TotalFrmNum=%d\n",
