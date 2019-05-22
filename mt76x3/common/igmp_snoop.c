@@ -1112,6 +1112,7 @@ NDIS_STATUS IgmpProtocolPktClone(
 			
 #ifdef UAPSD_SUPPORT
 			if (IS_ENTRY_CLIENT(tr_entry) 
+				&& (wcid < MAX_LEN_OF_MAC_TABLE) //CONFIG_RT_MAX_CLIENTS=64
 				&& (tr_entry->PsMode == PWR_SAVE)
 				&& UAPSD_MR_IS_UAPSD_AC(&pAd->MacTab.Content[wcid], QueIdx))
 			{
