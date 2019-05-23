@@ -223,7 +223,7 @@ VOID MtHandleRxPsPoll(RTMP_ADAPTER *pAd, UCHAR *pAddr, USHORT wcid, BOOLEAN isAc
 			if (Total_Packet_Number > 0)
 			{
 				{
-					DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("MtHandleRxPsPoll fetch tx queue tr_entry->ps_queue.Number= %x tr_entry->tx_queue[0].Number=%x Total_Packet_Number=%x\n",
+					DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("MtHandleRxPsPoll fetch tx queue tr_entry->ps_queue.Number= %x tr_entry->tx_queue[0].Number=%x Total_Packet_Number=%x\n",
 						tr_entry->ps_queue.Number, tr_entry->tx_queue[QID_AC_BE].Number, Total_Packet_Number));
 
 					for (i = (WMM_QUE_NUM - 0); i >=0; i--)
@@ -248,7 +248,7 @@ VOID MtHandleRxPsPoll(RTMP_ADAPTER *pAd, UCHAR *pAddr, USHORT wcid, BOOLEAN isAc
 			else /* Recieve ps_poll but no packet==>send NULL Packet */
 			{ 
 				BOOLEAN bQosNull = FALSE;
-				DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("RtmpHandleRxPsPoll no packet tr_entry->ps_queue.Number= %x tr_entry->tx_queue[0].Number=%x Total_Packet_Number=%x\n" 
+				DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("RtmpHandleRxPsPoll no packet tr_entry->ps_queue.Number= %x tr_entry->tx_queue[0].Number=%x Total_Packet_Number=%x\n" 
 					,tr_entry->ps_queue.Number, tr_entry->tx_queue[QID_AC_BE].Number, Total_Packet_Number));
 				if (CLIENT_STATUS_TEST_FLAG(pMacEntry, fCLIENT_STATUS_WMM_CAPABLE))
 					bQosNull = TRUE;
@@ -291,11 +291,11 @@ VOID MtHandleRxPsPoll(RTMP_ADAPTER *pAd, UCHAR *pAddr, USHORT wcid, BOOLEAN isAc
 		}
 #endif /*Power bit is 1 and ifndef MT_PS */
 
-		DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("%s null 0/1 wcid = %x mt_ps_queue.Number = %d\n",
+		DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("%s null 0/1 wcid = %x mt_ps_queue.Number = %d\n",
 			__FUNCTION__, tr_entry->wcid,
 			tr_entry->ps_queue.Number));
 
-		DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("%s tx_queue.Number = BE:%d, BK:%d, VI:%d, VO:%d, ps_state:%x, tx_queue.TokenCount = BE:%d, BK:%d, VI:%d, VO:%d\n",
+		DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("%s tx_queue.Number = BE:%d, BK:%d, VI:%d, VO:%d, ps_state:%x, tx_queue.TokenCount = BE:%d, BK:%d, VI:%d, VO:%d\n",
 			__FUNCTION__,
 			tr_entry->tx_queue[QID_AC_BE].Number,
 			tr_entry->tx_queue[QID_AC_BK].Number,
@@ -310,7 +310,7 @@ VOID MtHandleRxPsPoll(RTMP_ADAPTER *pAd, UCHAR *pAddr, USHORT wcid, BOOLEAN isAc
 #ifdef UAPSD_SUPPORT
 		//if (CLIENT_STATUS_TEST_FLAG(pMacEntry, fCLIENT_STATUS_APSD_CAPABLE))
 		{
-			DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("**** %s UAPSD_AllPacketDeliver\n", __FUNCTION__ ));
+			DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("**** %s UAPSD_AllPacketDeliver\n", __FUNCTION__ ));
 			
 			/* deliver all queued UAPSD packets */
 			UAPSD_AllPacketDeliver(pAd, pMacEntry);
@@ -343,7 +343,7 @@ VOID MtHandleRxPsPoll(RTMP_ADAPTER *pAd, UCHAR *pAddr, USHORT wcid, BOOLEAN isAc
 	if (IsDequeu == TRUE)
 	{
 		RTMPDeQueuePacket(pAd, FALSE, DequeuAC, tr_entry->wcid, DequeuCOUNT);
-		DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("%s IsDequeu == TRUE tr_entry->wcid=%x DequeuCOUNT=%d, ps_state=%d\n", __FUNCTION__, tr_entry->wcid, DequeuCOUNT, tr_entry->ps_state));
+		DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("%s IsDequeu == TRUE tr_entry->wcid=%x DequeuCOUNT=%d, ps_state=%d\n", __FUNCTION__, tr_entry->wcid, DequeuCOUNT, tr_entry->ps_state));
 	}    
 	return;
 	

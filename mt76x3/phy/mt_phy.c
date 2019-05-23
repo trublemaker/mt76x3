@@ -108,7 +108,7 @@ INT MTSmartCarrierSense(RTMP_ADAPTER *pAd)
 				RTMP_IO_WRITE32(pAd, CR_AGC_3, 0x818181E3);
 				RTMP_IO_WRITE32(pAd, CR_AGC_3_RX1, 0x818181E3);
 				pAd->SCSCtrl.SCSStatus = SCS_STATUS_ULTRA_LOW;
-				DBGPRINT(RT_DEBUG_ERROR, ("%s(): CSC=UL\n", __FUNCTION__));
+				DBGPRINT(RT_DEBUG_WARN, ("%s(): CSC=UL\n", __FUNCTION__));
 			}			
 		}
 		else if ((pAd->SCSCtrl.SCSMinRssi > -74) && (RxRatio < 90)) 
@@ -121,7 +121,7 @@ INT MTSmartCarrierSense(RTMP_ADAPTER *pAd)
 				RTMP_IO_WRITE32(pAd, CR_AGC_3, 0x8181D5E3);
 				RTMP_IO_WRITE32(pAd, CR_AGC_3_RX1, 0x8181D5E3);
 				pAd->SCSCtrl.SCSStatus = SCS_STATUS_LOW;
-				DBGPRINT(RT_DEBUG_ERROR, ("%s(): CSC=L\n", __FUNCTION__));
+				DBGPRINT(RT_DEBUG_WARN, ("%s(): CSC=L\n", __FUNCTION__));
 			}
 		}	
 		else
@@ -134,7 +134,7 @@ INT MTSmartCarrierSense(RTMP_ADAPTER *pAd)
 				RTMP_IO_WRITE32(pAd, CR_AGC_3, pAd->SCSCtrl.CR_AGC_3_default);
 				RTMP_IO_WRITE32(pAd, CR_AGC_3_RX1, pAd->SCSCtrl.CR_AGC_3_default);
 				pAd->SCSCtrl.SCSStatus = SCS_STATUS_DEFAULT;
-				DBGPRINT(RT_DEBUG_ERROR, ("%s(): CSC=H (Default)\n", __FUNCTION__));
+				DBGPRINT(RT_DEBUG_WARN, ("%s(): CSC=H (Default)\n", __FUNCTION__));
 			}
 		}
 	}
@@ -147,7 +147,7 @@ INT MTSmartCarrierSense(RTMP_ADAPTER *pAd)
 			RTMP_IO_WRITE32(pAd, CR_AGC_3, pAd->SCSCtrl.CR_AGC_3_default);
 			RTMP_IO_WRITE32(pAd, CR_AGC_3_RX1, pAd->SCSCtrl.CR_AGC_3_default);
 			pAd->SCSCtrl.SCSStatus = SCS_STATUS_DEFAULT;
-			DBGPRINT(RT_DEBUG_ERROR, ("%s(): CSC=H (Default)\n", __FUNCTION__));
+			DBGPRINT(RT_DEBUG_WARN, ("%s(): CSC=H (Default)\n", __FUNCTION__));
 		}
 	}
 	
