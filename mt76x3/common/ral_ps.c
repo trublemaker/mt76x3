@@ -188,14 +188,14 @@ BOOLEAN RalPsIndicate(RTMP_ADAPTER *pAd, UCHAR *pAddr, UCHAR wcid, UCHAR Psm)
 		pAd->MacTab.tr_entry[wcid].PsMode = Psm;
 
 		if (old_psmode != Psm) {
-			DBGPRINT(RT_DEBUG_INFO, ("%s():%02x:%02x:%02x:%02x:%02x:%02x %s!\n",
+			DBGPRINT(RT_DEBUG_WARN, ("%s():%02x:%02x:%02x:%02x:%02x:%02x %s!\n",
 					__FUNCTION__, PRINT_MAC(pAddr),
 					(Psm == PWR_SAVE ? "Sleep" : "wakes up, act like rx PS-POLL")));
 		}
 
 		if ((old_psmode == PWR_SAVE) && (Psm == PWR_ACTIVE))
-		{
-#ifdef RTMP_MAC_PCI
+		{xxxxxxxxxxx
+#ifdef RTMP_MAC_PCI 
 #ifdef DOT11_N_SUPPORT
 			/*
 				When sta wake up, we send BAR to refresh the BA sequence.
@@ -203,6 +203,7 @@ BOOLEAN RalPsIndicate(RTMP_ADAPTER *pAd, UCHAR *pAddr, UCHAR wcid, UCHAR Psm)
 					For RT2870, how to handle BA when STA in PS mode?
 			*/
 			SendRefreshBAR(pAd, pEntry);
+dddddd
 #endif /* DOT11_N_SUPPORT */
 #endif /* RTMP_MAC_PCI */
 

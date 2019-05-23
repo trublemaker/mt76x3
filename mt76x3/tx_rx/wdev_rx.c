@@ -1125,6 +1125,10 @@ VOID dev_rx_ctrl_frm(RTMP_ADAPTER *pAd, RX_BLK *pRxBlk)
 	HEADER_802_11 *pHeader = pRxBlk->pHeader;
 	PNDIS_PACKET pRxPacket = pRxBlk->pRxPacket;
 
+	if( 0 && SUBTYPE_BLOCK_ACK_REQ != pHeader->FC.SubType)
+		DBGPRINT(RT_DEBUG_WARN, ("****%s  SUBTYPE_PS_POLL pHeader->FC.SubType:%d\n", 
+			__FUNCTION__, pHeader->FC.SubType ));
+
 	switch (pHeader->FC.SubType)
 	{
 #ifdef DOT11_N_SUPPORT
@@ -1180,8 +1184,8 @@ VOID dev_rx_ctrl_frm(RTMP_ADAPTER *pAd, RX_BLK *pRxBlk)
 				}
 #endif /* MT_MAC */
 
-				DBGPRINT(RT_DEBUG_ERROR, ("----dev_rx_ctrl_frm0 SUBTYPE_PS_POLL pRxBlk->wcid: %x pEntry->wcid:-- \n",
-							pRxBlk->wcid ));
+				DBGPRINT(RT_DEBUG_ERROR, ("****dev_rx_ctrl_frm SUBTYPE_PS_POLL pRxBlk->wcid: %d.\n",
+							pRxBlk->wcid));
 				if (pRxBlk->wcid < MAX_LEN_OF_MAC_TABLE) {
                     //printk("dev_rx_ctrl_frm1 SUBTYPE_PS_POLL\n");
 					pEntry = &pAd->MacTab.Content[pRxBlk->wcid];

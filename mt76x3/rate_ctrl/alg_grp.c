@@ -941,10 +941,12 @@ VOID MlmeNewRateAdapt(
 	UCHAR CurrRateIdx = pEntry->CurrTxRateIndex;
 	RTMP_RA_GRP_TB *pCurrTxRate = PTX_RA_GRP_ENTRY(pTable, CurrRateIdx);
 
+	UCHAR endTRI,startTRI = pEntry->CurrTxRateIndex;
+
 	pEntry->LastSecTxRateChangeAction = RATE_NO_CHANGE;
 	pEntry->lastRateIdx = CurrRateIdx;
 
-	if (TxErrorRatio >= TrainDown)
+	if (TxErrorRatio > TrainDown)
 	{
 
 		/*  Downgrade TX quality if PER >= Rate-Down threshold */
@@ -1052,6 +1054,14 @@ VOID MlmeNewRateAdapt(
 		}
 #endif /*  CONFIG_AP_SUPPORT */
 
+		endTRI = pEntry->CurrTxRateIndex;
+
+		if(endTRI == 0)//startTRI)
+		{
+			DBGPRINT_RAW(RT_DEBUG_WARN,("**** %s CurrTxRateIndex %d --> %d .\n",
+				__FUNCTION__,startTRI,endTRI));
+		}
+
 		/*  Update PHY rate */
 		MlmeNewTxRate(pAd, pEntry);
 	}
@@ -1087,9 +1097,27 @@ VOID NewRateAdaptMT(
 	RTMP_RA_GRP_TB *pCurrTxRate = PTX_RA_GRP_ENTRY(pTable, CurrRateIdx);
 	//UCHAR		index;
 
+	UCHAR endTRI,startTRI = pEntry->CurrTxRateIndex;
+	
+	UCHAR NearStaLimitDownMCS = MCS_3;
+
+	if (pAd->RalinkCounters.OneSecFalseCCACnt > 3200)
+	{
+		NearStaLimitDownMCS = MCS_0;
+	}
+	else if (pAd->RalinkCounters.OneSecFalseCCACnt > 2500)
+	{
+		NearStaLimitDownMCS = MCS_2;
+	}
+	else
+	{
+		NearStaLimitDownMCS = MCS_3;
+	}
+
+
 	pEntry->LastSecTxRateChangeAction = RATE_NO_CHANGE;
 
-	if (Rate1ErrorRatio >= TrainDown) 
+	if (Rate1ErrorRatio > TrainDown) 
 	{
 		/*  Downgrade TX quality if PER >= Rate-Down threshold */
 		MlmeSetTxQuality(pEntry, CurrRateIdx, DRS_TX_QUALITY_WORST_BOUND);
@@ -1100,7 +1128,7 @@ VOID NewRateAdaptMT(
 			pEntry->LastSecTxRateChangeAction = RATE_DOWN;
 		}
 
-	} else {
+	} else { //Rate1ErrorRatio <= TrainDown
 		//RTMP_RA_GRP_TB *pUpRate = PTX_RA_GRP_ENTRY(pTable, UpRateIdx);
 
 		if ( Rate1ErrorRatio <= TrainUp ) {
@@ -1118,19 +1146,19 @@ VOID NewRateAdaptMT(
 				*/
 				MlmeDecTxQuality(pEntry, UpRateIdx);
 
-				if (pCurrTxRate->upMcs3!=CurrRateIdx &&
-					pCurrTxRate->upMcs3!=UpRateIdx)
+				if (pCurrTxRate->upMcs3 != CurrRateIdx &&
+					pCurrTxRate->upMcs3 != UpRateIdx)
 					MlmeDecTxQuality(pEntry, pCurrTxRate->upMcs3);
 
-				if (pCurrTxRate->upMcs2!=CurrRateIdx &&
-						pCurrTxRate->upMcs2!=UpRateIdx &&
-						pCurrTxRate->upMcs2!=pCurrTxRate->upMcs3)
+				if (pCurrTxRate->upMcs2 != CurrRateIdx &&
+						pCurrTxRate->upMcs2 != UpRateIdx &&
+						pCurrTxRate->upMcs2 != pCurrTxRate->upMcs3)
 					MlmeDecTxQuality(pEntry, pCurrTxRate->upMcs2);
 
-				if (pCurrTxRate->upMcs1!=CurrRateIdx &&
-						pCurrTxRate->upMcs1!=UpRateIdx &&
-						pCurrTxRate->upMcs1!=pCurrTxRate->upMcs3 &&
-						pCurrTxRate->upMcs1!=pCurrTxRate->upMcs2)
+				if (pCurrTxRate->upMcs1 != CurrRateIdx &&
+						pCurrTxRate->upMcs1 != UpRateIdx &&
+						pCurrTxRate->upMcs1 != pCurrTxRate->upMcs3 &&
+						pCurrTxRate->upMcs1 != pCurrTxRate->upMcs2)
 					MlmeDecTxQuality(pEntry, pCurrTxRate->upMcs1);
 			}
 		}
@@ -1192,6 +1220,14 @@ VOID NewRateAdaptMT(
 		}
 #endif /*  CONFIG_AP_SUPPORT */
 
+		endTRI = pEntry->CurrTxRateIndex;
+
+		if(endTRI != startTRI) //endTRI==0)// 
+		{
+			DBGPRINT_RAW(RT_DEBUG_WARN,("**** %s CurrTxRateIndex %d --> %d .\n",
+				__FUNCTION__,startTRI,endTRI));
+		}
+
 		/*  Update PHY rate */
 		MlmeNewTxRate(pAd, pEntry);
 	}
@@ -1243,9 +1279,6 @@ VOID QuickResponeForRateUpExecAdaptMT(/* actually for both up and down */
 	Rssi = RTMPMaxRssi(pAd, pEntry->RssiSample.AvgRssi[0], pEntry->RssiSample.AvgRssi[1], pEntry->RssiSample.AvgRssi[2]);
 
 	AsicTxCntUpdate(pAd, pEntry, &TxInfo);
-
-
-
 
 	TxTotalCnt = TxInfo.TxCount;
 	Rate1TxCnt = TxInfo.Rate1TxCnt;
@@ -1501,16 +1534,17 @@ static VOID HighTrafficRateAlg(RTMP_ADAPTER *pAd, MAC_TABLE_ENTRY *pEntry, MT_TX
 
 	HwAggRateIndex = pTxInfo->RateIndex;
 
-	DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("TxTotalCnt = %d\t", TxTotalCnt));
-	DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("Rate1 Tx Cnt = %d\t", pTxInfo->Rate1TxCnt));
-	DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("Rate2 Tx Cnt = %d\t", pTxInfo->Rate2TxCnt));
-	DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("Rate3 Tx Cnt = %d\t", pTxInfo->Rate3TxCnt));
-	DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("Rate4 Tx Cnt = %d\t", pTxInfo->Rate4TxCnt));
-	DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("Rate5 Tx Cnt = %d\t", pTxInfo->Rate5TxCnt));
-	DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("HwAggRateIndex = %d\n", HwAggRateIndex));
 	if(Rate1ErrorRatio>40){
+		DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_RA, ("TxTotalCnt = %d\t", TxTotalCnt));
+		DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("Rate1 Tx Cnt = %d\t", pTxInfo->Rate1TxCnt));
+		DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("Rate2 Tx Cnt = %d\t", pTxInfo->Rate2TxCnt));
+		DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("Rate3 Tx Cnt = %d\t", pTxInfo->Rate3TxCnt));
+		DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("Rate4 Tx Cnt = %d\t", pTxInfo->Rate4TxCnt));
+		DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("Rate5 Tx Cnt = %d\t", pTxInfo->Rate5TxCnt));
+		DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("HwAggRateIndex = %d\n", HwAggRateIndex));
 		DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_RA, ("Rate1 fail = %d\t", pTxInfo->Rate1FailCnt));
-		DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_RA, ("Rate1ErrorRatio = %d\n", Rate1ErrorRatio));
+		DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_RA, ("Rate1ErrorRatio = %d WCID(%d)\n", Rate1ErrorRatio, 
+		pEntry->wcid));
 	}
 
 	/*
@@ -1658,7 +1692,7 @@ VOID DynamicTxRateSwitchingAdaptMT(RTMP_ADAPTER *pAd, UINT i)
 	BOOLEAN bUpdateNewRate = FALSE, bResetCounters = FALSE;
 	UINT8 TrafficLoadingOld = pEntry->TrafficLoading;
 
-	DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("====================\n"));
+	//DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_RA, ("====================\n"));
 
 #ifdef THERMAL_PROTECT_SUPPORT
     if ( pAd->fgThermalProtectToggle == TRUE ) {
@@ -1668,8 +1702,6 @@ VOID DynamicTxRateSwitchingAdaptMT(RTMP_ADAPTER *pAd, UINT i)
 #endif /* THERMAL_PROTECT_SUPPORT */
 
 	AsicTxCntUpdate(pAd, pEntry, &TxInfo);
-
-
 
 	TxTotalCnt = TxInfo.TxCount;
 	/*  Save LastTxOkCount, LastTxPER and last MCS action for APQuickResponeForRateUpExec */
@@ -1732,7 +1764,7 @@ VOID DynamicTxRateSwitchingAdaptMT(RTMP_ADAPTER *pAd, UINT i)
 			/* High traffic rate alg */
 			HighTrafficRateAlg(pAd, pEntry, &TxInfo, Rssi);
 			bResetCounters = TRUE;
-			goto end_of_ra;
+			goto end_of_ra_high;
 			break;
 		}
 
@@ -1776,15 +1808,23 @@ VOID DynamicTxRateSwitchingAdaptMT(RTMP_ADAPTER *pAd, UINT i)
 
 end_of_ra:
 
-
 #ifdef DOT11N_DRAFT3
 	/* if we need to change BW, we should let the rate updated */
 	if (pAd->CommonCfg.Bss2040CoexistFlag & BSS_2040_COEXIST_BW_SYNC)
 		bUpdateNewRate = TRUE;		
 #endif /* DOT11N_DRAFT3 */
 
-	if ( bUpdateNewRate == TRUE)
+	if ( bUpdateNewRate == TRUE){
+		{
+			//if( pEntry->lastRateIdx == 0 )
+			DBGPRINT_RAW(RT_DEBUG_WARN,("**** %s CurrTxRateIndex %d --> %d .\n",
+				__FUNCTION__,pEntry->CurrTxRateIndex,pEntry->lastRateIdx));
+		}
+
 		MlmeNewTxRate(pAd, pEntry);
+	}
+
+end_of_ra_high:
 
 	if (bResetCounters == TRUE)
 	{

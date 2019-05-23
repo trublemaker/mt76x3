@@ -1478,7 +1478,7 @@ NTSTATUS MlmePeriodicExec(IN PRTMP_ADAPTER pAd, IN PCmdQElmt CMDQelmt)
 	}
 
     /* Following is the TxOP scenario, monitor traffic in every minutes */
-    if ((pAd->Mlme.PeriodicRound % 10) == 0)
+    if ((pAd->Mlme.PeriodicRound % 20) == 0) //mao
     {
 		TxOPUpdatingAlgo(pAd);
     }
@@ -1978,6 +1978,8 @@ VOID UpdateBasicRateBitmap(RTMP_ADAPTER *pAdapter)
         /* (2 ^ MAX_LEN_OF_SUPPORTED_RATES) -1 */
         return;
     }
+	
+	bitmap = pAdapter->CommonCfg.BasicRateBitmap;  /* renew bitmap value */
 
     for(i=0; i<MAX_LEN_OF_SUPPORTED_RATES; i++)
     {
@@ -4842,17 +4844,17 @@ CHAR RTMPMaxRssi(RTMP_ADAPTER *pAd, CHAR Rssi0, CHAR Rssi1, CHAR Rssi2)
 {
 	CHAR	larger = -127;
 	
-	if ((pAd->Antenna.field.RxPath == 1) && (Rssi0 != 0))
+	if ((pAd->Antenna.field.RxPath == 1) && (Rssi0 <= 0))
 	{
 		larger = Rssi0;
 	}
 
-	if ((pAd->Antenna.field.RxPath >= 2) && (Rssi1 != 0))
+	if ((pAd->Antenna.field.RxPath >= 2) && (Rssi1 <= 0))
 	{
 		larger = max(Rssi0, Rssi1);
 	}
 	
-	if ((pAd->Antenna.field.RxPath == 3) && (Rssi2 != 0))
+	if ((pAd->Antenna.field.RxPath == 3) && (Rssi2 <= 0))
 	{
 		larger = max(larger, Rssi2);
 	}
@@ -4867,17 +4869,17 @@ CHAR RTMPMinRssi(RTMP_ADAPTER *pAd, CHAR Rssi0, CHAR Rssi1, CHAR Rssi2)
 {
 	CHAR	smaller = -127;
 
-	if ((pAd->Antenna.field.RxPath == 1) && (Rssi0 != 0))
+	if ((pAd->Antenna.field.RxPath == 1) && (Rssi0 <= 0))
 	{
 		smaller = Rssi0;
 	}
 
-	if ((pAd->Antenna.field.RxPath >= 2) && (Rssi1 != 0))
+	if ((pAd->Antenna.field.RxPath >= 2) && (Rssi1 <= 0))
 	{
 		smaller = min(Rssi0, Rssi1);
 	}
 	
-	if ((pAd->Antenna.field.RxPath == 3) && (Rssi2 != 0))
+	if ((pAd->Antenna.field.RxPath == 3) && (Rssi2 <= 0))
 	{
 		smaller = min(smaller, Rssi2);
 	}

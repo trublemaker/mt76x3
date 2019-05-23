@@ -1119,7 +1119,17 @@ void AP_QueuePsActionPacket(
 			RTMP_SET_PACKET_UAPSD(pPacket, 1, MgmtQid);
 		}
 
-		UAPSD_PacketEnqueue(pAd, pMacEntry, pPacket, MgmtQid, FALSE);
+		
+		//if (UAPSD_MR_IS_UAPSD_AC(pMacEntry, pMacEntry->wcid))
+		if (CLIENT_STATUS_TEST_FLAG(pMacEntry, fCLIENT_STATUS_APSD_CAPABLE))
+		{
+			UAPSD_PacketEnqueue(pAd, pMacEntry, pPacket, MgmtQid, FALSE);
+			DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("****%s CLIENT_STATUS_TEST_FLAG true.\n",
+				__FUNCTION__));	
+		}else{			
+			DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("****%s CLIENT_STATUS_TEST_FLAG false.\n",
+				__FUNCTION__));			
+		}
 
 		if (pMacEntry->bAPSDAllAC)
 		{
@@ -2401,9 +2411,9 @@ VOID rtmp_ps_listforAll(RTMP_ADAPTER *pAd)
 	DBGPRINT(RT_DEBUG_OFF,("List:\t"));
 	DlListForEach(pEntry,&pAd->psTokenQueue,struct WCID_TABLE,list)
 	{
-		DBGPRINT(RT_DEBUG_LOUD,("%d\t",pEntry->wcid));
+		DBGPRINT(RT_DEBUG_TRACE,("%d\t",pEntry->wcid));
 	}
-	DBGPRINT(RT_DEBUG_LOUD,("\n"));
+	DBGPRINT(RT_DEBUG_TRACE,("\n"));
 }
 
 INT rtmp_ps_enq(RTMP_ADAPTER *pAd, STA_TR_ENTRY *tr_entry)
@@ -2419,13 +2429,13 @@ INT rtmp_ps_enq(RTMP_ADAPTER *pAd, STA_TR_ENTRY *tr_entry)
 	
 	if( tr_entry->PsTokenFlag != PS_TOKEN_STAT_WCID_PKT)
 	{
-		 tr_entry->PsTokenFlag  = PS_TOKEN_STAT_WCID_PKT;
+		tr_entry->PsTokenFlag  = PS_TOKEN_STAT_WCID_PKT;
 		DlListAdd(&pAd->psTokenQueue,&pEntry->list);		
-		DBGPRINT(RT_DEBUG_LOUD, ("enqueue PS fifo token to Token Queue, WCID: %d,%d.\n", tr_entry->wcid,pEntry->wcid));
+		DBGPRINT(RT_DEBUG_TRACE, ("enqueue PS fifo token to Token Queue, WCID: %d,%d.\n", tr_entry->wcid,pEntry->wcid));
 		
 	}else
 	{
-		DBGPRINT(RT_DEBUG_LOUD, ("not need enqueue WCID: %d.\n", tr_entry->wcid));
+		DBGPRINT(RT_DEBUG_TRACE, ("not need enqueue WCID: %d.\n", tr_entry->wcid));
 	}
 	/*rtmp_ps_listforAll(pAd);*/
 	return TRUE;
@@ -2460,7 +2470,7 @@ INT rtmp_psDeq_req(RTMP_ADAPTER *pAd)
 		if(tr_entry->enqCount <=0)
 		{	
 			tr_entry->PsTokenFlag = PS_TOKEN_STAT_IDLE;			
-			DBGPRINT(RT_DEBUG_LOUD,("%s(): ps token flag =%d,wcid =%d\n",__FUNCTION__,tr_entry->PsTokenFlag,psEntry->wcid));
+			DBGPRINT(RT_DEBUG_TRACE,("%s(): ps token flag =%d,wcid =%d\n",__FUNCTION__,tr_entry->PsTokenFlag,psEntry->wcid));
 			continue;
 		}		
 		tr_entry->PsTokenFlag = PS_TOKEN_STAT_PKT;
@@ -2476,7 +2486,7 @@ INT rtmp_psDeq_req(RTMP_ADAPTER *pAd)
 			if ((fifo_swq->swq[fifo_swq->enqIdx] != 0)  || !(tr_entry->enq_cap))
 			{			
 				rtmp_ps_enq(pAd,tr_entry);
-				DBGPRINT(RT_DEBUG_LOUD,("%s(): fifo is full,flag:%d,enqId:%d,deqId:%d, cap: %d \n",__FUNCTION__,tr_entry->PsTokenFlag,fifo_swq->enqIdx,fifo_swq->deqIdx,tr_entry->enq_cap));
+				DBGPRINT(RT_DEBUG_TRACE,("%s(): fifo is full,flag:%d,enqId:%d,deqId:%d, cap: %d \n",__FUNCTION__,tr_entry->PsTokenFlag,fifo_swq->enqIdx,fifo_swq->deqIdx,tr_entry->enq_cap));
 				break;
 			}
 
@@ -2484,7 +2494,7 @@ INT rtmp_psDeq_req(RTMP_ADAPTER *pAd)
 			INC_RING_INDEX(fifo_swq->enqIdx, TX_SWQ_FIFO_LEN);	
 		}
 	
-		DBGPRINT(RT_DEBUG_LOUD,("%s(): deq  for PS retrieve and PSM change. WCID: %d,stat: %d\n",__FUNCTION__,tr_entry->wcid,tr_entry->PsTokenFlag));
+		DBGPRINT(RT_DEBUG_TRACE,("%s(): deq  for PS retrieve and PSM change. WCID: %d,stat: %d\n",__FUNCTION__,tr_entry->wcid,tr_entry->PsTokenFlag));
 		return TRUE;
 	}
 
@@ -2499,12 +2509,13 @@ INT rtmp_psDeq_report(RTMP_ADAPTER *pAd,struct dequeue_info *info)
 	if(tr_entry->enqCount > 0  && tr_entry->PsTokenFlag == PS_TOKEN_STAT_PKT)
 	{
 		rtmp_ps_enq(pAd,tr_entry);
-		DBGPRINT(RT_DEBUG_LOUD,("%s(): After DeqReport, re-enq PsToken, WCID: %d,STAT: %d\n",__FUNCTION__,info->target_wcid,tr_entry->PsTokenFlag));
+		DBGPRINT(RT_DEBUG_TRACE,("%s(): After DeqReport, re-enq PsToken, WCID: %d,STAT: %d tr_entry->enqCount:%d\n",
+			__FUNCTION__,info->target_wcid,tr_entry->PsTokenFlag,tr_entry->enqCount));
 	}else
 	if(tr_entry->enqCount <= 0 && tr_entry->PsTokenFlag != PS_TOKEN_STAT_IDLE)
 	{		
 		tr_entry->PsTokenFlag = PS_TOKEN_STAT_IDLE;		
-		DBGPRINT(RT_DEBUG_LOUD,("%s(): After DeqReport, Abort PsToken, WCID: %d,STAT: %d\n",__FUNCTION__,info->target_wcid,tr_entry->PsTokenFlag));
+		DBGPRINT(RT_DEBUG_TRACE,("%s(): After DeqReport, Abort PsToken, WCID: %d,STAT: %d tr_entry->enqCount:%d\n",__FUNCTION__,info->target_wcid,tr_entry->PsTokenFlag,tr_entry->enqCount));
 	}
 	return TRUE;
 }

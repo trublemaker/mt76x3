@@ -310,8 +310,15 @@ VOID UAPSD_AllPacketDeliver(RTMP_ADAPTER *pAd, MAC_TABLE_ENTRY *pEntry)
 			QueId = QID_AC_BE;
 		}
 
-		if (rtmp_enq_req(pAd, QUEUE_ENTRY_TO_PACKET(pEntry->pUAPSDEOSPFrame), QueId, tr_entry, FALSE, NULL) == FALSE)
+		if (CLIENT_STATUS_TEST_FLAG(pEntry, fCLIENT_STATUS_APSD_CAPABLE))
+		{
+			if (rtmp_enq_req(pAd, QUEUE_ENTRY_TO_PACKET(pEntry->pUAPSDEOSPFrame), QueId, tr_entry, FALSE, NULL) == FALSE)
+				RELEASE_NDIS_PACKET(pAd, QUEUE_ENTRY_TO_PACKET(pEntry->pUAPSDEOSPFrame), NDIS_STATUS_FAILURE);		
+		}else{
+			DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("**** %s !CLIENT_STATUS_APSD_CAPABLE RELEASE_NDIS_PACKET\n", __FUNCTION__ ));
 			RELEASE_NDIS_PACKET(pAd, QUEUE_ENTRY_TO_PACKET(pEntry->pUAPSDEOSPFrame), NDIS_STATUS_FAILURE);
+		}
+
 
 		pEntry->pUAPSDEOSPFrame = NULL;
 		pEntry->UAPSDTxNum = 0;
@@ -326,9 +333,14 @@ VOID UAPSD_AllPacketDeliver(RTMP_ADAPTER *pAd, MAC_TABLE_ENTRY *pEntry)
 		while(pQueApsd->Head)
 		{
 			pQueEntry = RemoveHeadQueue(pQueApsd);
-
-			if (rtmp_enq_req(pAd, QUEUE_ENTRY_TO_PACKET(pQueEntry), QueId, tr_entry, FALSE, NULL) == FALSE)
+			if (CLIENT_STATUS_TEST_FLAG(pEntry, fCLIENT_STATUS_APSD_CAPABLE))
+			{
+				if (rtmp_enq_req(pAd, QUEUE_ENTRY_TO_PACKET(pQueEntry), QueId, tr_entry, FALSE, NULL) == FALSE)
+					RELEASE_NDIS_PACKET(pAd, QUEUE_ENTRY_TO_PACKET(pQueEntry), NDIS_STATUS_FAILURE);
+			}else{			
+				DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("**** %s !CLIENT_STATUS_APSD_CAPABLE RELEASE_NDIS_PACKET\n", __FUNCTION__ ));
 				RELEASE_NDIS_PACKET(pAd, QUEUE_ENTRY_TO_PACKET(pQueEntry), NDIS_STATUS_FAILURE);
+			}
 		}
 	}
 
@@ -504,6 +516,22 @@ VOID UAPSD_PacketEnqueue(
 	{
         	/* queue the tx packet to the U-APSD queue of the AC */
 		UAPSD_SEM_LOCK(&pAd->UAPSDEOSPLock, flags);
+
+		UCHAR wcid = RTMP_GET_PACKET_WCID(pPacket);
+
+		MAC_TABLE_ENTRY *pMacEntry = &pAd->MacTab.Content[wcid];
+		DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("oooo %s  AC: %d wcid: %d\n",
+   		__FUNCTION__, IdAc, wcid)); 
+
+//#include "uapsd.h" 		//IdAc;
+		if(!pMacEntry->bAPSDDeliverEnabledPerAC[(IdAc)])
+		//if (UAPSD_MR_IS_UAPSD_AC(pMacEntry, IdAc))
+		{
+			 DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("oooo %s !UAPSD_MR_IS_UAPSD_AC\n",
+				__FUNCTION__));	
+		}
+
+		
 		if (bFromHead)
 			InsertHeadQueue(pQueUapsd, PACKET_TO_QUEUE_ENTRY(pPacket))
 		else

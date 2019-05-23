@@ -157,7 +157,7 @@ VOID RtmpHandleRxPsPoll(RTMP_ADAPTER *pAd, UCHAR *pAddr, USHORT wcid, BOOLEAN is
 		return;
 	}
 
-#ifdef UAPSD_SUPPORT00
+#ifdef UAPSD_SUPPORT
 	if (UAPSD_MR_IS_ALL_AC_UAPSD(isActive, pMacEntry))
 	{
 		/*

@@ -36,7 +36,7 @@ static VOID MtReadPseRdTabAccessReg(
 	}
 	while ( GET_PSE_RTA_RD_KICK_BUSY(*p_rPseRdTabAccessReg) == 1 );
 
-	DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_PS, ("%s: *p_rPseRdTabAccessReg = 0x%x\n",
+	DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("%s: *p_rPseRdTabAccessReg = 0x%x\n",
 			__FUNCTION__, *p_rPseRdTabAccessReg));
 }
 
@@ -54,7 +54,7 @@ static VOID MtClearPseRdTab(
 	}
 	while ( GET_PSE_RTA_RD_KICK_BUSY(rPseRdTabAccessReg) == 1 );
 
-	DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_PS, ("%s: rPseRdTabAccessReg = 0x%x wcid=%d\n",
+	DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("%s: rPseRdTabAccessReg = 0x%x wcid=%d\n",
 			__FUNCTION__, rPseRdTabAccessReg, wcid));
 }
 
@@ -73,7 +73,7 @@ VOID MtSetIgnorePsm(
 
 	if (mt_wtbl_get_entry234(pAd, pEntry->wcid, &tb_entry) == FALSE) 
 	{
-		DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_PS, ("%s():Cannot found WTBL2/3/4\n",__FUNCTION__));
+		DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("%s():Cannot found WTBL2/3/4\n",__FUNCTION__));
 		return;
 	}
 
@@ -104,7 +104,7 @@ VOID CheckSkipTX(
 	NdisZeroMemory(&tb_entry, sizeof(tb_entry));
 	if (mt_wtbl_get_entry234(pAd, pEntry->wcid, &tb_entry) == FALSE) 
 	{
-		DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_PS, ("%s():Cannot found WTBL2/3/4\n",__FUNCTION__));
+		DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("%s():Cannot found WTBL2/3/4\n",__FUNCTION__));
 		return;
 	}
 	tr_entry = &pAd->MacTab.tr_entry[pEntry->wcid];
@@ -204,7 +204,7 @@ VOID MtHandleRxPsPoll(RTMP_ADAPTER *pAd, UCHAR *pAddr, USHORT wcid, BOOLEAN isAc
 #endif
 	tr_entry = &pAd->MacTab.tr_entry[wcid];
 	
-	if (isActive == FALSE) /* ps poll */
+	if (!isActive) /* ps poll */ //!isActive
 	{
 #ifdef MT_PS
 		if (tr_entry->ps_state == APPS_RETRIEVE_DONE) /*state is finish(sleep)*/
@@ -214,7 +214,7 @@ VOID MtHandleRxPsPoll(RTMP_ADAPTER *pAd, UCHAR *pAddr, USHORT wcid, BOOLEAN isAc
 				MT_SET_IGNORE_PSM(pAd, pMacEntry, I_PSM_ENABLE);
 			}
 		}
-
+		
 		if(tr_entry->ps_state == APPS_RETRIEVE_DONE || tr_entry->ps_state == APPS_RETRIEVE_IDLE)
 		{
 			for (i = 0; i < WMM_QUE_NUM; i++)
@@ -223,10 +223,10 @@ VOID MtHandleRxPsPoll(RTMP_ADAPTER *pAd, UCHAR *pAddr, USHORT wcid, BOOLEAN isAc
 			if (Total_Packet_Number > 0)
 			{
 				{
-					DBGPRINT(RT_DEBUG_TRACE | DBG_FUNC_PS, ("RtmpHandleRxPsPoll fetch tx queue tr_entry->ps_queue.Number= %x tr_entry->tx_queue[0].Number=%x Total_Packet_Number=%x\n",
+					DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("MtHandleRxPsPoll fetch tx queue tr_entry->ps_queue.Number= %x tr_entry->tx_queue[0].Number=%x Total_Packet_Number=%x\n",
 						tr_entry->ps_queue.Number, tr_entry->tx_queue[QID_AC_BE].Number, Total_Packet_Number));
 
-					for (i = (WMM_QUE_NUM - 1); i >=0; i--)
+					for (i = (WMM_QUE_NUM - 0); i >=0; i--)
 					{
 						if (tr_entry->tx_queue[i].Head)
 						{
@@ -248,7 +248,7 @@ VOID MtHandleRxPsPoll(RTMP_ADAPTER *pAd, UCHAR *pAddr, USHORT wcid, BOOLEAN isAc
 			else /* Recieve ps_poll but no packet==>send NULL Packet */
 			{ 
 				BOOLEAN bQosNull = FALSE;
-				DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_PS, ("RtmpHandleRxPsPoll no packet tr_entry->ps_queue.Number= %x tr_entry->tx_queue[0].Number=%x Total_Packet_Number=%x\n" 
+				DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("RtmpHandleRxPsPoll no packet tr_entry->ps_queue.Number= %x tr_entry->tx_queue[0].Number=%x Total_Packet_Number=%x\n" 
 					,tr_entry->ps_queue.Number, tr_entry->tx_queue[QID_AC_BE].Number, Total_Packet_Number));
 				if (CLIENT_STATUS_TEST_FLAG(pMacEntry, fCLIENT_STATUS_WMM_CAPABLE))
 					bQosNull = TRUE;
@@ -257,6 +257,7 @@ VOID MtHandleRxPsPoll(RTMP_ADAPTER *pAd, UCHAR *pAddr, USHORT wcid, BOOLEAN isAc
 				pMacEntry->Aid, pMacEntry->func_tb_idx,
 				bQosNull, TRUE, 0);
 			} 
+			
 			if (Total_Packet_Number >1)
 			{
 				WLAN_MR_TIM_BIT_SET(pAd, tr_entry->func_tb_idx, tr_entry->wcid);
@@ -290,12 +291,12 @@ VOID MtHandleRxPsPoll(RTMP_ADAPTER *pAd, UCHAR *pAddr, USHORT wcid, BOOLEAN isAc
 		}
 #endif /*Power bit is 1 and ifndef MT_PS */
 
-		DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_PS, ("RtmpHandleRxPsPoll null0/1 wcid = %x mt_ps_queue.Number = %d\n",
-			tr_entry->wcid,
+		DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("%s null 0/1 wcid = %x mt_ps_queue.Number = %d\n",
+			__FUNCTION__, tr_entry->wcid,
 			tr_entry->ps_queue.Number));
 
-		DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_PS, ("%s(%d) tx_queue.Number = BE:%d, BK:%d, VI:%d, VO:%d, ps_state:%x,  tx_queue.TokenCount = BE:%d, BK:%d, VI:%d, VO:%d\n",
-			__FUNCTION__, __LINE__,
+		DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("%s tx_queue.Number = BE:%d, BK:%d, VI:%d, VO:%d, ps_state:%x, tx_queue.TokenCount = BE:%d, BK:%d, VI:%d, VO:%d\n",
+			__FUNCTION__,
 			tr_entry->tx_queue[QID_AC_BE].Number,
 			tr_entry->tx_queue[QID_AC_BK].Number,
 			tr_entry->tx_queue[QID_AC_VI].Number,
@@ -307,8 +308,10 @@ VOID MtHandleRxPsPoll(RTMP_ADAPTER *pAd, UCHAR *pAddr, USHORT wcid, BOOLEAN isAc
 			tr_entry->TokenCount[QID_AC_VO]));
 
 #ifdef UAPSD_SUPPORT
-		if (CLIENT_STATUS_TEST_FLAG(pMacEntry, fCLIENT_STATUS_APSD_CAPABLE))
+		//if (CLIENT_STATUS_TEST_FLAG(pMacEntry, fCLIENT_STATUS_APSD_CAPABLE))
 		{
+			DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("**** %s UAPSD_AllPacketDeliver\n", __FUNCTION__ ));
+			
 			/* deliver all queued UAPSD packets */
 			UAPSD_AllPacketDeliver(pAd, pMacEntry);
 
@@ -317,13 +320,17 @@ VOID MtHandleRxPsPoll(RTMP_ADAPTER *pAd, UCHAR *pAddr, USHORT wcid, BOOLEAN isAc
 		}
 #endif /* UAPSD_SUPPORT */
 
+#define STR1(R) #R	 
+#define STR2(R) STR1(R)
+#pragma message "MAX_TX_PROCESS: " STR2( MAX_TX_PROCESS )
+
 		if (tr_entry->enqCount > 0) 
 		{
 			IsDequeu = TRUE;
-			DequeuAC = NUM_OF_TX_RING;
-			if (tr_entry->enqCount > MAX_TX_PROCESS)
+			DequeuAC = NUM_OF_TX_RING;MAX_TX_PROCESS;
+			if (tr_entry->enqCount > 8/*MAX_TX_PROCESS*/)
 			{
-				DequeuCOUNT = MAX_TX_PROCESS;
+				DequeuCOUNT = 8/*MAX_TX_PROCESS*/;
 				rtmp_ps_enq(pAd,tr_entry);
 			}
 			else
@@ -336,7 +343,7 @@ VOID MtHandleRxPsPoll(RTMP_ADAPTER *pAd, UCHAR *pAddr, USHORT wcid, BOOLEAN isAc
 	if (IsDequeu == TRUE)
 	{
 		RTMPDeQueuePacket(pAd, FALSE, DequeuAC, tr_entry->wcid, DequeuCOUNT);
-		DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_PS, ("RtmpHandleRxPsPoll IsDequeu == TRUE tr_entry->wcid=%x DequeuCOUNT=%d, ps_state=%d\n",tr_entry->wcid, DequeuCOUNT, tr_entry->ps_state));
+		DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("%s IsDequeu == TRUE tr_entry->wcid=%x DequeuCOUNT=%d, ps_state=%d\n", __FUNCTION__, tr_entry->wcid, DequeuCOUNT, tr_entry->ps_state));
 	}    
 	return;
 	
@@ -386,11 +393,11 @@ BOOLEAN MtPsIndicate(RTMP_ADAPTER *pAd, UCHAR *pAddr, UCHAR wcid, UCHAR Psm)
 		if(tr_entry->ps_state == APPS_RETRIEVE_DONE)
 		{
 			tr_entry->ps_state = APPS_RETRIEVE_IDLE;
-			DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_PS, ("%s(%d): STA wakes up!\n", __FUNCTION__, __LINE__));
+			DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("%s(%d): STA wakes up!\n", __FUNCTION__, __LINE__));
 			MtHandleRxPsPoll(pAd, pAddr, wcid, TRUE);
 		}
 		else
-			DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_PS, ("%s(%d):wcid=%d, old_psmode=%d, now_psmode=%d, wrong ps_state=%d ???\n",
+			DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("%s(%d):wcid=%d, old_psmode=%d, now_psmode=%d, wrong ps_state=%d ???\n",
 					__FUNCTION__, __LINE__, wcid, old_psmode, Psm, tr_entry->ps_state));
 	}
 	else if ((old_psmode == PWR_ACTIVE) && (Psm == PWR_SAVE))
@@ -402,12 +409,12 @@ BOOLEAN MtPsIndicate(RTMP_ADAPTER *pAd, UCHAR *pAddr, UCHAR wcid, UCHAR Psm)
 		if (tr_entry->ps_state == APPS_RETRIEVE_IDLE)
 		{ 
 #ifdef MT_PS
-			DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_PS, ("%s(%d):wcid=%d, old_psmode=%d, now_psmode=%d, ps_state=%d start retrieving!!\n",
+			DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("%s(%d):wcid=%d, old_psmode=%d, now_psmode=%d, ps_state=%d start retrieving!!\n",
 					__FUNCTION__, __LINE__, wcid, old_psmode, Psm, tr_entry->ps_state));
 
 #if defined(MT7603) && defined(RTMP_PCI_SUPPORT)
 			if (MtStartPSRetrieve(pAd, wcid) == TRUE) {
-			tr_entry->ps_state = APPS_RETRIEVE_START_PS;
+				tr_entry->ps_state = APPS_RETRIEVE_START_PS;
 			} else {
 				struct tx_swq_fifo *ps_fifo_swq;
 				INT enq_idx;
@@ -439,7 +446,7 @@ BOOLEAN MtPsIndicate(RTMP_ADAPTER *pAd, UCHAR *pAddr, UCHAR wcid, UCHAR Psm)
 #endif /* !MT_PS */
 		}
 		else
-			DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_PS, ("%s(%d):wcid=%d, old_psmode=%d, now_psmode=%d, wrong ps_state=%d ???\n",
+			DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("%s(%d):wcid=%d, old_psmode=%d, now_psmode=%d, wrong ps_state=%d ???\n",
 					__FUNCTION__, __LINE__, wcid, old_psmode, Psm, tr_entry->ps_state));
 	}
 	else
@@ -617,21 +624,21 @@ VOID MtEnqTxSwqFromPsQueue(RTMP_ADAPTER *pAd, UCHAR qidx, STA_TR_ENTRY *tr_entry
 		if(pAcPsQue->Number > 0  && tr_entry->wcid > 0 && tr_entry->wcid < MAX_LEN_OF_TR_TABLE)
 		{
 			rtmp_ps_enq(pAd,tr_entry);
-			DBGPRINT(RT_DEBUG_TRACE | DBG_FUNC_PS, ("pAcPsQue->Number=%d,PS:%d\n",pAcPsQue->Number,tr_entry->PsTokenFlag));			
+			DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("pAcPsQue->Number=%d,PS:%d\n",pAcPsQue->Number,tr_entry->PsTokenFlag));			
 		}
 
 		while(pAcPsQue->Head)
 		{
 			pQEntry = RemoveTailQueue(pAcPsQue);
 			if(tr_entry->enqCount > SQ_ENQ_NORMAL_MAX) {
-			RELEASE_NDIS_PACKET(pAd, QUEUE_ENTRY_TO_PACKET(pQEntry), NDIS_STATUS_FAILURE);
-			continue;
-                        }
-		InsertHeadQueue(pAcTxQue, pQEntry); 			
+				RELEASE_NDIS_PACKET(pAd, QUEUE_ENTRY_TO_PACKET(pQEntry), NDIS_STATUS_FAILURE);
+				continue;
+           }
+			InsertHeadQueue(pAcTxQue, pQEntry); 			
 #ifdef LIMIT_GLOBAL_SW_QUEUE
 			TR_ENQ_COUNT_INC(tr_entry, &pAd->TxSwQueue[qidx]);
 #else /* LIMIT_GLOBAL_SW_QUEUE */
-		TR_ENQ_COUNT_INC(tr_entry);
+			TR_ENQ_COUNT_INC(tr_entry);
 #endif /* ! LIMIT_GLOBAL_SW_QUEUE */
 		}
 	}
