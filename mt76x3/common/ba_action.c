@@ -10,8 +10,8 @@
 #define ORI_BA_SESSION_TIMEOUT	(2000)	/* ms */
 #define REC_BA_SESSION_IDLE_TIMEOUT	(1000)	/* ms */
 
-#define REORDERING_PACKET_TIMEOUT		((100 * OS_HZ)/1000)	/* system ticks -- 100 ms*/
-#define MAX_REORDERING_PACKET_TIMEOUT	((3000 * OS_HZ)/1000)	/* system ticks -- 100 ms*/
+#define REORDERING_PACKET_TIMEOUT		((90 * OS_HZ)/1000)	/* system ticks -- 100 ms*/
+#define MAX_REORDERING_PACKET_TIMEOUT	((2000 * OS_HZ)/1000)	/* system ticks -- 100 ms*/
 
 
 #define RESET_RCV_SEQ		(0xFFFF)
@@ -444,7 +444,7 @@ void ba_flush_reordering_timeout_mpdus(
     			pBAEntry->LastIndSeq = Sequence;
     		}
 
-		DBGPRINT(RT_DEBUG_OFF, ("%x, flush one!\n", pBAEntry->LastIndSeq));
+		DBGPRINT(RT_DEBUG_OFF, ("%3x, flush one!\n", pBAEntry->LastIndSeq));
 
 	}
 }
@@ -666,7 +666,7 @@ BOOLEAN BARecSessionAdd(
 		/* initial sequence number */
 		pBAEntry->LastIndSeq = RESET_RCV_SEQ; /*pFrame->BaStartSeq.field.StartSeq;*/
 
-		DBGPRINT(RT_DEBUG_OFF, ("Start Seq = %08x\n",  pFrame->BaStartSeq.field.StartSeq));
+		DBGPRINT(RT_DEBUG_WARN, ("Start Seq = %08x\n",  pFrame->BaStartSeq.field.StartSeq));
 
 		if (pEntry->RXBAbitmap & (1<<TID))
 			RTMPCancelTimer(&pBAEntry->RECBATimer, &Cancelled);
@@ -1150,7 +1150,7 @@ VOID PeerAddBAReqAction(RTMP_ADAPTER *pAd, MLME_QUEUE_ELEM *Elem)
 	{
 		if ((pAd->CommonCfg.bBADecline == FALSE) && IS_HT_STA(pMacEntry))
 		{
-			DBGPRINT(RT_DEBUG_OFF, ("Rcv Wcid(%d) AddBAReq\n", Elem->Wcid));
+			DBGPRINT(RT_DEBUG_WARN, ("Rcv Wcid(%d) AddBAReq\n", Elem->Wcid));
 			if (BARecSessionAdd(pAd, &pAd->MacTab.Content[Elem->Wcid], pAddreqFrame))
 			{
 #ifdef PEER_DELBA_TX_ADAPT
