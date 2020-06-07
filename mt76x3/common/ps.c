@@ -182,7 +182,7 @@ VOID RtmpHandleRxPsPoll(RTMP_ADAPTER *pAd, UCHAR *pAddr, USHORT wcid, BOOLEAN is
 			But we follow the WiFi WMM Spec.
 		*/
 
-		DBGPRINT(RT_DEBUG_TRACE, ("All AC are UAPSD, can not use PS-Poll\n"));
+		DBGPRINT(RT_DEBUG_WARN, ("All AC are UAPSD, can not use PS-Poll\n"));
 		return; /* all AC are U-APSD, can not use PS-Poll */
 	}
 #endif /* UAPSD_SUPPORT */
@@ -196,7 +196,7 @@ VOID RtmpHandleRxPsPoll(RTMP_ADAPTER *pAd, UCHAR *pAddr, USHORT wcid, BOOLEAN is
 		if (tr_entry->PsDeQWaitCnt == 0) {
 			tr_entry->PsDeQWaitCnt = 1;
 		} else {
-			DBGPRINT(RT_DEBUG_TRACE,
+			DBGPRINT(RT_DEBUG_WARN,
 					("%s(): : packet not send by HW then ignore other PS-Poll Aid[%d]!\n",
 					__FUNCTION__, pMacEntry->Aid));
 			return;

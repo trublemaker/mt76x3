@@ -683,7 +683,7 @@ static VOID CmdPsClearRsp(struct cmd_msg *msg, char *Data, UINT16 Len)
    else
       tr_entry->ps_state = APPS_RETRIEVE_DONE;
 
-   DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_PS, ("wcid=%d, Receive Event of CmdPsClear tr_entry->ps_state=%d\n", WlanIndex,tr_entry->ps_state));
+   DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("wcid=%d, Receive Event of CmdPsClear tr_entry->ps_state=%d\n", WlanIndex,tr_entry->ps_state));
 
 	if(tr_entry->token_enq_all_fail)
 	{
