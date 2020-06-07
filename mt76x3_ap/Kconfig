@@ -7,17 +7,17 @@ config MT76X3_AP
 config  MT76X3_AP_LED
 	bool "LED support"
 	depends on MT76X3_AP
-	default y
+	default n
 
 config  MT76X3_AP_LED_SOFT
 	bool "Soft LED support"
 	depends on MT76X3_AP && !MT76X3_AP_LED && RALINK_GPIO_LED
-	default n
+	default y
 
 config  MT76X3_AP_LED_SOFT_GPIO
 	int "Soft LED GPIO pin"
 	depends on MT76X3_AP && MT76X3_AP_LED_SOFT
-	default -1
+	default 14
 
 config  MT76X3_AP_LLTD
 	bool "LLTD (Link Layer Topology Discovery Protocol)"
