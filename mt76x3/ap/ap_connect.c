@@ -591,9 +591,11 @@ VOID APUpdateBeaconFrame(RTMP_ADAPTER *pAd, INT apidx)
         }
 #endif /* RTMP_PCI_SUPPORT */
 
-	if (pMbss->bcn_buf.bcn_state != BCN_TX_IDLE) {
+	if (pMbss->bcn_buf.bcn_state != BCN_TX_IDLE 
+		&& pMbss->bcn_buf.bcn_state !=  BCN_TX_DMA_DONE
+		) {
 		if (!RTMP_TEST_FLAG(pAd, fRTMP_ADAPTER_HALT_IN_PROGRESS)) {
-			DBGPRINT(RT_DEBUG_WARN, ("%s()=>BSS%d:BcnPkt not idle(%d)!\n",
+			DBGPRINT(RT_DEBUG_WARN, ("%s()=>BSS%d:BcnPkt not idle(state:%d)!\n",
 							__FUNCTION__, apidx, pMbss->bcn_buf.bcn_state));
 		}
 #ifdef RTMP_PCI_SUPPORT

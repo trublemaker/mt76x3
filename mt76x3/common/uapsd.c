@@ -295,6 +295,8 @@ VOID UAPSD_AllPacketDeliver(RTMP_ADAPTER *pAd, MAC_TABLE_ENTRY *pEntry)
 	ULONG flags = 0;
 
 	UAPSD_SEM_LOCK(&pAd->UAPSDEOSPLock, flags);
+	
+	DBGPRINT(RT_DEBUG_WARN  , ("%s():==>  ", __FUNCTION__,pEntry->pUAPSDEOSPFrame ));
 
 	tr_entry = &pAd->MacTab.tr_entry[pEntry->wcid];
 	/* check if the EOSP frame is yet transmitted out */
@@ -312,10 +314,11 @@ VOID UAPSD_AllPacketDeliver(RTMP_ADAPTER *pAd, MAC_TABLE_ENTRY *pEntry)
 
 		if (CLIENT_STATUS_TEST_FLAG(pEntry, fCLIENT_STATUS_APSD_CAPABLE))
 		{
+			DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("**** %s rtmp_enq_req CLIENT_STATUS_APSD_CAPABLE QueId：%d \n", __FUNCTION__, QueId ));
 			if (rtmp_enq_req(pAd, QUEUE_ENTRY_TO_PACKET(pEntry->pUAPSDEOSPFrame), QueId, tr_entry, FALSE, NULL) == FALSE)
 				RELEASE_NDIS_PACKET(pAd, QUEUE_ENTRY_TO_PACKET(pEntry->pUAPSDEOSPFrame), NDIS_STATUS_FAILURE);		
 		}else{
-			DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("**** %s !CLIENT_STATUS_APSD_CAPABLE RELEASE_NDIS_PACKET\n", __FUNCTION__ ));
+			DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("**** %s !CLIENT_STATUS_APSD_CAPABLE  QueId：%d \n", __FUNCTION__, QueId  ));
 			RELEASE_NDIS_PACKET(pAd, QUEUE_ENTRY_TO_PACKET(pEntry->pUAPSDEOSPFrame), NDIS_STATUS_FAILURE);
 		}
 
@@ -335,10 +338,11 @@ VOID UAPSD_AllPacketDeliver(RTMP_ADAPTER *pAd, MAC_TABLE_ENTRY *pEntry)
 			pQueEntry = RemoveHeadQueue(pQueApsd);
 			if (CLIENT_STATUS_TEST_FLAG(pEntry, fCLIENT_STATUS_APSD_CAPABLE))
 			{
+				DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("**** %s rtmp_enq_req CLIENT_STATUS_APSD_CAPABLE IdAc:%d \n", __FUNCTION__, IdAc ));
 				if (rtmp_enq_req(pAd, QUEUE_ENTRY_TO_PACKET(pQueEntry), QueId, tr_entry, FALSE, NULL) == FALSE)
 					RELEASE_NDIS_PACKET(pAd, QUEUE_ENTRY_TO_PACKET(pQueEntry), NDIS_STATUS_FAILURE);
 			}else{			
-				DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("**** %s !CLIENT_STATUS_APSD_CAPABLE RELEASE_NDIS_PACKET\n", __FUNCTION__ ));
+				DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("**** %s !CLIENT_STATUS_APSD_CAPABLE RELEASE_NDIS_PACKET IdAc:%d \n", __FUNCTION__, IdAc  ));
 				RELEASE_NDIS_PACKET(pAd, QUEUE_ENTRY_TO_PACKET(pQueEntry), NDIS_STATUS_FAILURE);
 			}
 		}
@@ -395,7 +399,6 @@ VOID UAPSD_AssocParse(
 		/* backup its UAPSD parameters */
 		pQosInfo = (PQBSS_STA_INFO_PARM) pElm;
 
-
 		UAPSD[QID_AC_BE] = pQosInfo->UAPSD_AC_BE;
 		UAPSD[QID_AC_BK] = pQosInfo->UAPSD_AC_BK;
 		UAPSD[QID_AC_VI] = pQosInfo->UAPSD_AC_VI;
@@ -403,11 +406,12 @@ VOID UAPSD_AssocParse(
 
 		pEntry->MaxSPLength = pQosInfo->MaxSPLength;
 
-		DBGPRINT(RT_DEBUG_TRACE | DBG_FUNC_UAPSD, ("apsd> UAPSD %d %d %d %d!\n",
+		DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_UAPSD, ("apsd> UAPSD %d %d %d %d! MaxSPLength = %d, ",
 					pQosInfo->UAPSD_AC_BE, pQosInfo->UAPSD_AC_BK,
-					pQosInfo->UAPSD_AC_VI, pQosInfo->UAPSD_AC_VO));
-		DBGPRINT(RT_DEBUG_TRACE | DBG_FUNC_UAPSD, ("apsd> MaxSPLength = %d\n",
+					pQosInfo->UAPSD_AC_VI, pQosInfo->UAPSD_AC_VO,
 					pEntry->MaxSPLength));
+		//DBGPRINT(RT_DEBUG_OFF | DBG_FUNC_UAPSD, ("apsd> MaxSPLength = %d\n",
+		//			pEntry->MaxSPLength));
 
 		/* use static UAPSD setting of association request frame */
 		for(IdApsd=0; IdApsd<4; IdApsd++)
@@ -435,13 +439,13 @@ VOID UAPSD_AssocParse(
 			(pEntry->bAPSDCapablePerAC[QID_AC_VO] == 1))
 		{
 			/* all AC are U-APSD */
-			DBGPRINT(RT_DEBUG_TRACE | DBG_FUNC_UAPSD, ("apsd> all AC are UAPSD\n"));
+			DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_UAPSD, ("all AC are UAPSD\n"));
 			pEntry->bAPSDAllAC = 1;
 		}
 		else
 		{
 			/* at least one AC is not U-APSD */
-			DBGPRINT(RT_DEBUG_TRACE | DBG_FUNC_UAPSD, ("apsd> at least one AC is not UAPSD %d %d %d %d\n",
+			DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_UAPSD, ("at least one AC is not UAPSD %d %d %d %d\n",
 			pEntry->bAPSDCapablePerAC[QID_AC_BE],
 			pEntry->bAPSDCapablePerAC[QID_AC_BK],
 			pEntry->bAPSDCapablePerAC[QID_AC_VI],
@@ -451,7 +455,7 @@ VOID UAPSD_AssocParse(
 
 		pEntry->VirtualTimeout = 0;
 
-		DBGPRINT(RT_DEBUG_TRACE | DBG_FUNC_UAPSD, ("apsd> MaxSPLength = %d\n", pEntry->MaxSPLength));
+		//DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_UAPSD, ("apsd> MaxSPLength = %d\n", pEntry->MaxSPLength));
 	}
 }
 
@@ -521,21 +525,23 @@ VOID UAPSD_PacketEnqueue(
 
 		MAC_TABLE_ENTRY *pMacEntry = &pAd->MacTab.Content[wcid];
 		DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("oooo %s  AC: %d wcid: %d\n",
-   		__FUNCTION__, IdAc, wcid)); 
+   			__FUNCTION__, IdAc, wcid)); 
 
-//#include "uapsd.h" 		//IdAc;
-		if(!pMacEntry->bAPSDDeliverEnabledPerAC[(IdAc)])
-		//if (UAPSD_MR_IS_UAPSD_AC(pMacEntry, IdAc))
+		//#if 0
+		if (CLIENT_STATUS_TEST_FLAG(pMacEntry, fCLIENT_STATUS_APSD_CAPABLE))
 		{
-			 DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("oooo %s !UAPSD_MR_IS_UAPSD_AC\n",
-				__FUNCTION__));	
+			DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("oooo %s fCLIENT_STATUS_APSD_CAPABLE InsertQueue.\n",	__FUNCTION__));	
+			if (bFromHead)
+				InsertHeadQueue(pQueUapsd, PACKET_TO_QUEUE_ENTRY(pPacket))
+			else
+				InsertTailQueue(pQueUapsd, PACKET_TO_QUEUE_ENTRY(pPacket));
+		}else
+		//#endif
+		{
+			DBGPRINT(RT_DEBUG_ERROR | DBG_FUNC_PS, ("oooo %s !fCLIENT_STATUS_APSD_CAPABLE RELEASE_NDIS_PACKET.\n",	__FUNCTION__));	
+			RELEASE_NDIS_PACKET(pAd, pPacket, NDIS_STATUS_FAILURE);
 		}
 
-		
-		if (bFromHead)
-			InsertHeadQueue(pQueUapsd, PACKET_TO_QUEUE_ENTRY(pPacket))
-		else
-			InsertTailQueue(pQueUapsd, PACKET_TO_QUEUE_ENTRY(pPacket));
 		UAPSD_SEM_UNLOCK(&pAd->UAPSDEOSPLock, flags);
 
 #ifdef UAPSD_DEBUG

@@ -10,8 +10,8 @@
 #define ORI_BA_SESSION_TIMEOUT	(2000)	/* ms */
 #define REC_BA_SESSION_IDLE_TIMEOUT	(1000)	/* ms */
 
-#define REORDERING_PACKET_TIMEOUT		((90 * OS_HZ)/1000)	/* system ticks -- 100 ms*/
-#define MAX_REORDERING_PACKET_TIMEOUT	((2000 * OS_HZ)/1000)	/* system ticks -- 100 ms*/
+#define REORDERING_PACKET_TIMEOUT		((60 * OS_HZ)/1000)	/* system ticks -- 100 ms*/
+#define MAX_REORDERING_PACKET_TIMEOUT	((1000 * OS_HZ)/1000)	/* system ticks -- 100 ms*/
 
 
 #define RESET_RCV_SEQ		(0xFFFF)
@@ -444,7 +444,7 @@ void ba_flush_reordering_timeout_mpdus(
     			pBAEntry->LastIndSeq = Sequence;
     		}
 
-		DBGPRINT(RT_DEBUG_OFF, ("%3x, flush one!\n", pBAEntry->LastIndSeq));
+		DBGPRINT(RT_DEBUG_OFF, ("mt76x3 %3x, flush one!\n", pBAEntry->LastIndSeq));
 
 	}
 }

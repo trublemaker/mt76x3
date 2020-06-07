@@ -187,7 +187,7 @@ VOID MtHandleRxPsPoll(RTMP_ADAPTER *pAd, UCHAR *pAddr, USHORT wcid, BOOLEAN isAc
 {
 #ifdef CONFIG_AP_SUPPORT
 #if defined(MT_PS) || defined(UAPSD_SUPPORT)
-	MAC_TABLE_ENTRY *pMacEntry;
+	MAC_TABLE_ENTRY *pMacEntry=NULL;
 #endif
 	STA_TR_ENTRY *tr_entry;
 	BOOLEAN       IsDequeu= FALSE;
@@ -295,7 +295,7 @@ VOID MtHandleRxPsPoll(RTMP_ADAPTER *pAd, UCHAR *pAddr, USHORT wcid, BOOLEAN isAc
 			__FUNCTION__, tr_entry->wcid,
 			tr_entry->ps_queue.Number));
 
-		DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("%s tx_queue.Number = BE:%d, BK:%d, VI:%d, VO:%d, ps_state:%x, tx_queue.TokenCount = BE:%d, BK:%d, VI:%d, VO:%d\n",
+		DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("%s tx_queue.Number :: BE:%d, BK:%d, VI:%d, VO:%d, ps_state:%x, tx_queue.TokenCount = BE:%d, BK:%d, VI:%d, VO:%d\n",
 			__FUNCTION__,
 			tr_entry->tx_queue[QID_AC_BE].Number,
 			tr_entry->tx_queue[QID_AC_BK].Number,
@@ -310,14 +310,14 @@ VOID MtHandleRxPsPoll(RTMP_ADAPTER *pAd, UCHAR *pAddr, USHORT wcid, BOOLEAN isAc
 #ifdef UAPSD_SUPPORT
 		//if (CLIENT_STATUS_TEST_FLAG(pMacEntry, fCLIENT_STATUS_APSD_CAPABLE))
 		{
-			DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("**** %s UAPSD_AllPacketDeliver\n", __FUNCTION__ ));
+			//DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("**** %s UAPSD_AllPacketDeliver\n", __FUNCTION__ ));
 			
 			/* deliver all queued UAPSD packets */
 			UAPSD_AllPacketDeliver(pAd, pMacEntry);
+		}
 
 			/* end the SP if exists */
-			UAPSD_MR_ENTRY_RESET(pAd, pMacEntry);
-		}
+		UAPSD_MR_ENTRY_RESET(pAd, pMacEntry);
 #endif /* UAPSD_SUPPORT */
 
 #define STR1(R) #R	 
@@ -342,8 +342,8 @@ VOID MtHandleRxPsPoll(RTMP_ADAPTER *pAd, UCHAR *pAddr, USHORT wcid, BOOLEAN isAc
 
 	if (IsDequeu == TRUE)
 	{
-		RTMPDeQueuePacket(pAd, FALSE, DequeuAC, tr_entry->wcid, DequeuCOUNT);
 		DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("%s IsDequeu == TRUE tr_entry->wcid=%x DequeuCOUNT=%d, ps_state=%d\n", __FUNCTION__, tr_entry->wcid, DequeuCOUNT, tr_entry->ps_state));
+		RTMPDeQueuePacket(pAd, FALSE, DequeuAC, tr_entry->wcid, DequeuCOUNT);
 	}    
 	return;
 	
@@ -390,10 +390,12 @@ BOOLEAN MtPsIndicate(RTMP_ADAPTER *pAd, UCHAR *pAddr, UCHAR wcid, UCHAR Psm)
 		/*
 			STA wakes up.
 		*/		
+		
+		DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("%s(%d): STA wakes up wcid=%d! \n", __FUNCTION__, __LINE__,wcid ));
+		
 		if(tr_entry->ps_state == APPS_RETRIEVE_DONE)
 		{
 			tr_entry->ps_state = APPS_RETRIEVE_IDLE;
-			DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("%s(%d): STA wakes up!\n", __FUNCTION__, __LINE__));
 			MtHandleRxPsPoll(pAd, pAddr, wcid, TRUE);
 		}
 		else
@@ -406,6 +408,7 @@ BOOLEAN MtPsIndicate(RTMP_ADAPTER *pAd, UCHAR *pAddr, UCHAR wcid, UCHAR Psm)
 			STA goes to sleep.
 		*/
 
+		DBGPRINT(RT_DEBUG_WARN | DBG_FUNC_PS, ("%s(%d): STA PWR SAVE !\n", __FUNCTION__, __LINE__));
 		if (tr_entry->ps_state == APPS_RETRIEVE_IDLE)
 		{ 
 #ifdef MT_PS
@@ -451,7 +454,7 @@ BOOLEAN MtPsIndicate(RTMP_ADAPTER *pAd, UCHAR *pAddr, UCHAR wcid, UCHAR Psm)
 	}
 	else
 	{
-		DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_PS, ("%s(%d): ps state is not changed, do nothing here.\n",
+		DBGPRINT(RT_DEBUG_LOUD | DBG_FUNC_PS, ("%s(%d): ps state is not changed, do nothing here.\n",
 			__FUNCTION__, __LINE__));
 	}
    

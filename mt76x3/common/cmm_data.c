@@ -704,7 +704,7 @@ UINT32 parse_rx_packet_type(RTMP_ADAPTER *ad, RX_BLK *rx_blk, VOID *rx_packet)
 					DBGPRINT(RT_DEBUG_INFO | DBG_FUNC_PS, ("parse_rx_packet_type  not token txd_1->wlan_idx: %x, rx_packet addr: %x rx_wcid: %x\n",txd_1->wlan_idx,(u32)rx_packet,RTMP_GET_PACKET_WCID(rx_packet)));
 					RTMP_SET_PACKET_WDEV(rx_packet, tr_entry->wdev->wdev_idx);
 
-					RTMP_IRQ_LOCK(&ad->irq_lock, IrqFlags);
+					//RTMP_IRQ_LOCK(&ad->irq_lock, IrqFlags);
 					if (tr_entry->ps_queue.Number >= MAX_PACKETS_IN_PS_QUEUE)
 					{
 						// drop the ps retrive pks due to limit ps queue max length
@@ -714,7 +714,7 @@ UINT32 parse_rx_packet_type(RTMP_ADAPTER *ad, RX_BLK *rx_blk, VOID *rx_packet)
 					{
 						InsertTailQueue(&tr_entry->ps_queue, PACKET_TO_QUEUE_ENTRY(rx_packet));
 					}
-					RTMP_IRQ_UNLOCK(&ad->irq_lock, IrqFlags);
+					//RTMP_IRQ_UNLOCK(&ad->irq_lock, IrqFlags);
 
 #ifdef UAPSD_SUPPORT
 					if (UAPSD_MR_IS_NOT_TIM_BIT_NEEDED_HANDLED(&ad->MacTab.Content[tr_entry->wcid], ac_idx))
@@ -2422,6 +2422,7 @@ INT rtmp_ps_enq(RTMP_ADAPTER *pAd, STA_TR_ENTRY *tr_entry)
 
 	if(tr_entry->wcid  >= MAX_LEN_OF_TR_TABLE )
 	{
+		DBGPRINT(RT_DEBUG_WARN, ("tr_entry->wcid  >= MAX_LEN_OF_TR_TABLE: %d,%d.\n", tr_entry->wcid, MAX_LEN_OF_TR_TABLE ));
 		return TRUE;
 	}
 
@@ -3385,7 +3386,7 @@ inline VOID RTMPDeQueuePacket(
 
 		DEQUEUE_LOCK(&pAd->irq_lock, in_hwIRQ, IrqFlags);
 		deq_packet_gatter(pAd, &deq_info, pTxBlk, in_hwIRQ);
-		DEQUEUE_UNLOCK(&pAd->irq_lock, in_hwIRQ, IrqFlags);
+		//DEQUEUE_UNLOCK(&pAd->irq_lock, in_hwIRQ, IrqFlags);
 		
 		if (pTxBlk->TotalFrameNum) {
 #ifdef DATA_QUEUE_RESERVE
@@ -3397,8 +3398,8 @@ inline VOID RTMPDeQueuePacket(
 			if (pTxBlk->wdev)
 				ASSERT(pTxBlk->wdev->wdev_hard_tx);
 
-			if (IS_PCI_INF(pAd) || IS_RBUS_INF(pAd))
-				DEQUEUE_LOCK(&pAd->irq_lock, in_hwIRQ, IrqFlags);
+			//if (IS_PCI_INF(pAd) || IS_RBUS_INF(pAd))
+			//	DEQUEUE_LOCK(&pAd->irq_lock, in_hwIRQ, IrqFlags);
 			
 			if (pTxBlk->wdev && pTxBlk->wdev->wdev_hard_tx) {
 				pTxBlk->wdev->wdev_hard_tx(pAd, pTxBlk);
@@ -3415,15 +3416,15 @@ inline VOID RTMPDeQueuePacket(
 #endif /* CONFIG_AP_SUPPORT */
 			}
 			
-			if (IS_PCI_INF(pAd) || IS_RBUS_INF(pAd))
-				DEQUEUE_UNLOCK(&pAd->irq_lock, in_hwIRQ, IrqFlags);
+			//if (IS_PCI_INF(pAd) || IS_RBUS_INF(pAd))
+			//	DEQUEUE_UNLOCK(&pAd->irq_lock, in_hwIRQ, IrqFlags);
 
 			Count += pTxBlk->TotalFrameNum;
 		}
 
 		RTMP_STOP_DEQUEUE(pAd, QueIdx, IrqFlags);
 
-		DEQUEUE_LOCK(&pAd->irq_lock, in_hwIRQ, IrqFlags);
+		//DEQUEUE_LOCK(&pAd->irq_lock, in_hwIRQ, IrqFlags);
 		rtmp_deq_report(pAd, &deq_info);
 		DEQUEUE_UNLOCK(&pAd->irq_lock, in_hwIRQ, IrqFlags);
 
