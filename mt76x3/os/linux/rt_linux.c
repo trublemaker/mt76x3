@@ -43,8 +43,12 @@
 #endif
 
 #if defined(CONFIG_RA_HW_NAT) || defined(CONFIG_RA_HW_NAT_MODULE)
-#include "../../../../../../../net/nat/hw_nat/ra_nat.h"
-#include "../../../../../../../net/nat/hw_nat/frame_engine.h"
+//#include "../../../../../../../net/nat/hw_nat/ra_nat.h"
+//#include "../../../../../../../net/nat/hw_nat/frame_engine.h"
+
+#include "../net/nat/hw_nat/ra_nat.h"
+#include "../net/nat/hw_nat/frame_engine.h"
+
 #endif
 
 /* TODO */
@@ -90,8 +94,8 @@ static inline void netdev_priv_set(struct net_device *dev, void *priv)
 }
 
 
-ULONG RTDebugLevel = RT_DEBUG_OFF;
-ULONG RTDebugFunc = 0;
+ULONG RTDebugLevel = RT_DEBUG_ERROR;
+ULONG RTDebugFunc = 0; //DBG_FUNC_PS | DBG_FUNC_PS;
 
 #ifdef OS_ABL_FUNC_SUPPORT
 ULONG RTPktOffsetData = 0, RTPktOffsetLen = 0, RTPktOffsetCB = 0;
